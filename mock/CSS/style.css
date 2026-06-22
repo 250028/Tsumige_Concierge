@@ -1,0 +1,212 @@
+/* =============================================
+   style.css — Bootstrapで代替できない部分のみ
+   =============================================
+   Bootstrap で置き換えた主なもの：
+   - レイアウト: d-flex, gap-*, px-*, mb-*, align-items-*, justify-content-*
+   - タイポ    : fw-bold, fw-semibold, text-muted, text-uppercase, text-truncate
+   - コンポーネント: card, badge, list-group, progress, rounded-*
+   - グリッド  : row, col, row-cols-*, g-*
+   - 表示制御  : d-none, d-md-flex, overflow-auto
+   ============================================= */
+
+/* =============================================
+   1. カラー変数
+   ============================================= */
+:root {
+  --c-purple:    #7C3AED;
+  --c-purple-lt: #EDE9FE;
+  --c-purple-md: #C4B5FD;
+  --c-gold:      #D97706;
+  --c-gold-lt:   #FEF3C7;
+  --c-bg:        #F5F3FF;
+}
+
+body { background: var(--c-bg); }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--c-purple-md); border-radius: 4px; }
+
+/* =============================================
+   2. ヒーローカードスタック
+      transform: rotate() はBootstrapで不可
+   ============================================= */
+.hero-stack  { position: relative; height: 210px; }
+.card-layer  { position: absolute; inset: 0; background: #fff; border-radius: 20px; border: 1px solid rgba(124,58,237,.15); }
+.cl-back2    { transform: rotate(3.5deg)  translateY(10px); z-index: 1; opacity: .4; }
+.cl-back1    { transform: rotate(-1.8deg) translateY(5px);  z-index: 2; opacity: .65; }
+.cl-front    { z-index: 3; }
+
+/* =============================================
+   3. チャットバブル
+      非対称の border-radius はBootstrapで不可
+   ============================================= */
+.msg      { max-width: 87%; padding: 7px 11px; font-size: 12px; line-height: 1.5; }
+.msg-ai   { align-self: flex-start; background: var(--c-purple-lt); color: #1C1B2E; border-radius: 4px 14px 14px 14px; }
+.msg-user { align-self: flex-end;   background: var(--c-gold-lt);   color: #78350F; border-radius: 14px 4px 14px 14px; }
+
+/* =============================================
+   4. アクションボタン（縦アイコン+テキスト構成）
+      flex-direction: column の独自レイアウト
+   ============================================= */
+.btn-act {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 4px;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,.09);
+  background: #fff;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .12s;
+}
+.btn-act:active      { transform: scale(.95); }
+.btn-act .act-icon   { font-size: 20px; line-height: 1; }
+.btn-act .act-sub    { font-size: 9px; opacity: .65; font-weight: 400; }
+.btn-act-primary     { flex: 1.8; background: var(--c-purple); color: #fff; border-color: transparent; }
+.btn-act-primary:hover { background: #6D28D9; color: #fff; }
+
+/* =============================================
+   5. 送信ボタン（円形）
+      Bootstrap の btn-circle は存在しない
+   ============================================= */
+.send-btn {
+  width: 33px; height: 33px;
+  background: var(--c-purple);
+  border-radius: 50%;
+  border: none; color: #fff;
+  font-size: 14px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.send-btn:hover { background: #6D28D9; }
+
+/* =============================================
+   6. タブ切り替え
+      Bootstrap の tab は JS が必要なため独自管理
+   ============================================= */
+.tab-pane           { display: none; padding-top: 14px; }
+.tab-pane.active    { display: block; }
+.tab-content-wrap   { padding-bottom: 72px; }
+
+/* =============================================
+   7. フィルター / ペルソナ チップ
+      active カラーのオーバーライド
+   ============================================= */
+.f-chip, .p-chip {
+  font-size: 11px;
+  padding: 4px 13px;
+  border-radius: 20px;
+  border: 1px solid rgba(124,58,237,.25);
+  background: #fff;
+  color: #6B7280;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.f-chip.active, .p-chip.active {
+  background: var(--c-purple);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* =============================================
+   8. ゲームアイテム hover
+      Bootstrap の border-color 変更は JS が必要
+   ============================================= */
+.game-item           { cursor: pointer; transition: border-color .15s; }
+.game-item:hover     { border-color: var(--c-purple-md) !important; }
+
+/* =============================================
+   9. ボトムナビ（スマホ）
+      position: fixed はBootstrapのfixed-bottomと
+      競合するため独自クラスで管理
+   ============================================= */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 64px;
+  background: #fff;
+  border-top: 1px solid rgba(0,0,0,.08);
+  display: flex;
+  z-index: 200;
+}
+.nav-btn {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 2px;
+  border: none; background: none;
+  color: #6B7280; font-size: 9.5px; cursor: pointer;
+}
+.nav-btn i       { font-size: 21px; }
+.nav-btn.active  { color: var(--c-purple); }
+
+/* =============================================
+   10. PCレイアウト（3カラムグリッド）
+       Bootstrap の grid は 12分割のflex基盤のため
+       display: grid の固定3カラムには対応不可
+   ============================================= */
+.pc-sidebar, .pc-chat-panel { display: none; }
+
+@media (min-width: 768px) {
+  body {
+    display: grid;
+    grid-template-columns: 220px 1fr 300px;
+    grid-template-rows: 100vh;
+    overflow: hidden;
+  }
+
+  .mobile-header, .bottom-nav { display: none !important; }
+  .tab-content-wrap            { padding-bottom: 0; }
+  .app-wrapper                 { grid-column: 2; overflow-y: auto; }
+
+  /* PCサイドバー */
+  .pc-sidebar {
+    display: flex; flex-direction: column;
+    grid-column: 1;
+    height: 100vh;
+    background: #fff;
+    border-right: 1px solid rgba(124,58,237,.1);
+    overflow-y: auto;
+  }
+  .pc-nav-btn {
+    display: flex; align-items: center; gap: 9px;
+    padding: 8px 12px; margin: 1px 8px;
+    border-radius: 10px;
+    font-size: 12.5px; color: #6B7280;
+    border: none; background: none;
+    width: calc(100% - 16px);
+    text-align: left; cursor: pointer;
+    transition: background .12s, color .12s;
+  }
+  .pc-nav-btn i                    { font-size: 17px; }
+  .pc-nav-btn:hover,
+  .pc-nav-btn.active               { background: var(--c-purple-lt); color: var(--c-purple); }
+  .pc-nav-btn.active               { font-weight: 600; }
+
+  /* PC右チャットパネル */
+  .pc-chat-panel {
+    display: flex; flex-direction: column;
+    grid-column: 3;
+    height: 100vh;
+    background: #fff;
+    border-left: 1px solid rgba(124,58,237,.1);
+  }
+  .pc-chat-msgs {
+    flex: 1; overflow-y: auto;
+    padding: 12px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .pc-chat-input {
+    flex: 1;
+    background: var(--c-bg);
+    border: 1px solid rgba(124,58,237,.22);
+    border-radius: 20px;
+    padding: 7px 13px; font-size: 12px;
+    outline: none;
+  }
+  .pc-chat-input::placeholder { color: #6B7280; }
+}

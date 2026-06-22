@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>積みゲー・コンシェルジュ</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- =====================================================
+     PC サイドバー（スマホでは非表示）
+====================================================== -->
+<aside class="pc-sidebar">
+  <!-- ロゴ -->
+  <div class="px-3 py-3 border-bottom">
+    <div class="fw-bold" style="font-size:13px; color:var(--c-purple);">✨ 積みゲー・コンシェルジュ</div>
+    <div class="text-muted mt-1" style="font-size:11px;">こんにちは、由梨花さん</div>
+  </div>
+
+  <!-- ナビ -->
+  <p class="text-uppercase fw-bold text-muted px-3 pt-3 mb-1" style="font-size:9.5px; letter-spacing:.07em;">メイン</p>
+  <button class="pc-nav-btn active" data-pc-tab="home"><i class="bi bi-house"></i>ホーム</button>
+  <button class="pc-nav-btn" data-pc-tab="list"><i class="bi bi-collection"></i>積みゲーリスト</button>
+  <button class="pc-nav-btn" data-pc-tab="castle"><i class="bi bi-buildings"></i>積みゲー城</button>
+  <button class="pc-nav-btn" data-pc-tab="profile"><i class="bi bi-person-circle"></i>プロフィール</button>
+
+  <p class="text-uppercase fw-bold text-muted px-3 pt-3 mb-1" style="font-size:9.5px; letter-spacing:.07em;">機能</p>
+  <button class="pc-nav-btn" id="pc-chat-focus-btn"><i class="bi bi-chat-heart"></i>AIチャット <small class="opacity-50" style="font-size:9px;">→ 右パネル</small></button>
+  <button class="pc-nav-btn"><i class="bi bi-dice-3"></i>ランダムセレクト</button>
+  <button class="pc-nav-btn"><i class="bi bi-star"></i>実績・ポイント</button>
+  <button class="pc-nav-btn"><i class="bi bi-gear"></i>設定</button>
+
+  <!-- 消化率 -->
+  <div class="mt-auto p-3 border-top" style="font-size:11px;">
+    <div class="d-flex justify-content-between mb-1">
+      <span class="text-muted">積みゲー消化率</span><span class="fw-semibold">33%</span>
+    </div>
+    <div class="progress mb-2" style="height:4px;">
+      <div class="progress-bar" style="width:33%; background:var(--c-purple);"></div>
+    </div>
+    <div class="d-flex justify-content-between mb-1">
+      <span class="text-muted">総積み本数</span><span class="fw-semibold">24本</span>
+    </div>
+    <div class="d-flex justify-content-between">
+      <span class="text-muted">クリア済み</span><span class="fw-semibold text-success">12本</span>
+    </div>
+  </div>
+</aside>
+
+<!-- =====================================================
+     アプリラッパー（メインコンテンツ）
+====================================================== -->
+<div class="app-wrapper">
+
+  <!-- スマホ ヘッダー（Bootstrapのsticky-top + d-flex） -->
+  <header class="bg-white border-bottom sticky-top px-3 py-2 d-flex align-items-center justify-content-between mobile-header">
+    <span class="fw-bold" style="font-size:14px; color:var(--c-purple);">✨ 積みゲー・コンシェルジュ</span>
+    <div class="d-flex gap-1">
+      <span class="badge rounded-pill fw-semibold" style="background:var(--c-purple-lt); color:var(--c-purple);">積み 24</span>
+      <span class="badge rounded-pill fw-semibold" style="background:var(--c-gold-lt); color:var(--c-gold);">済 12</span>
+    </div>
+  </header>
+
+  <div class="tab-content-wrap">
+
+    <!-- ==========================================
+         ホームタブ
+    =========================================== -->
+    <div id="tab-home" class="tab-pane active">
+
+      <!-- PCのみ: ヘッダー（d-none d-md-flex） -->
+      <div class="d-none d-md-flex align-items-center justify-content-between px-3 pt-4 pb-3">
+        <h5 class="fw-bold mb-0">今日の積みゲー 🎮</h5>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-secondary">+ ゲームを追加</button>
+          <button class="btn btn-sm text-white" style="background:var(--c-purple);" id="rand-btn-pc">🎲 ランダムで選ぶ</button>
+        </div>
+      </div>
+
+      <!-- PCのみ: 統計グリッド（Bootstrap row row-cols-4） -->
+      <div class="row row-cols-4 g-2 px-3 mb-3 d-none d-md-flex">
+        <div class="col">
+          <div class="card border h-100" style="border-color:rgba(124,58,237,.12)!important; border-radius:12px;">
+            <div class="card-body p-3">
+              <div class="text-muted" style="font-size:10px;">積みゲー総数</div>
+              <div class="fw-bold" style="font-size:22px;">24</div>
+              <div class="text-danger" style="font-size:10px;">先月比 +3</div>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card border h-100" style="border-color:rgba(124,58,237,.12)!important; border-radius:12px;">
+            <div class="card-body p-3">
+              <div class="text-muted" style="font-size:10px;">プレイ中</div>
+              <div class="fw-bold" style="font-size:22px;">3</div>
+              <div class="text-muted" style="font-size:10px;">継続中</div>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card border h-100" style="border-color:rgba(124,58,237,.12)!important; border-radius:12px;">
+            <div class="card-body p-3">
+              <div class="text-muted" style="font-size:10px;">クリア済み</div>
+              <div class="fw-bold" style="font-size:22px;">12</div>
+              <div class="text-success" style="font-size:10px;">先月比 +2</div>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card border h-100" style="border-color:rgba(124,58,237,.12)!important; border-radius:12px;">
+            <div class="card-body p-3">
+              <div class="text-muted" style="font-size:10px;">城のHP</div>
+              <div class="fw-bold" style="font-size:22px;">🏰 48%</div>
+              <div class="text-warning" style="font-size:10px;">注意！</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AIおすすめ 今日の1本 -->
+      <div class="px-3 mb-3">
+        <p class="text-uppercase fw-bold text-muted mb-2" style="font-size:10.5px; letter-spacing:.07em;">🎯 AIのおすすめ — 今日の1本</p>
+
+        <!-- カードスタック -->
+        <div class="hero-stack">
+          <div class="card-layer cl-back2"></div>
+          <div class="card-layer cl-back1"></div>
+          <div class="card-layer cl-front p-3">
+            <p class="text-uppercase fw-bold mb-1" style="font-size:10px; color:var(--c-purple); letter-spacing:.07em;">
+              <i class="bi bi-stars"></i> コンシェルジュより
+            </p>
+            <h2 class="fw-bold lh-sm mb-2" style="font-size:18px; color:#1C1B2E;" id="hero-title">
+              ゼルダの伝説<br>ティアーズ オブ ザ キングダム
+            </h2>
+            <p class="text-muted mb-2" style="font-size:11.5px; line-height:1.55;" id="hero-reason">
+              「2時間あれば続きから充分楽しめます。前回は第3の祠をクリアしたところ。操作はすぐ思い出せますよ！」
+            </p>
+            <div class="d-flex flex-wrap gap-1" id="hero-tags">
+              <span class="badge rounded-2 fw-normal" style="background:var(--c-purple-lt); color:var(--c-purple); font-size:10px;">🎮 Switch</span>
+              <span class="badge rounded-2 fw-normal" style="background:var(--c-purple-lt); color:var(--c-purple); font-size:10px;">⚔️ アドベンチャー</span>
+              <span class="badge rounded-2 fw-normal" style="background:var(--c-purple-lt); color:var(--c-purple); font-size:10px;">🕐 残り約60h</span>
+              <span class="badge rounded-2 fw-normal" style="background:var(--c-purple-lt); color:var(--c-purple); font-size:10px;">📌 序盤で放置</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- アクションボタン -->
+        <div class="d-flex gap-2 mt-2">
+          <button class="btn-act btn-act-primary" id="play-btn">
+            <span class="act-icon">▶️</span>
+            <span>今すぐプレイ</span>
+            <span class="act-sub">このゲームを遊ぶ</span>
+          </button>
+          <button class="btn-act" id="rand-btn">
+            <span class="act-icon">🎲</span>
+            <span>ランダム</span>
+            <span class="act-sub">別の1本を選ぶ</span>
+          </button>
+          <button class="btn-act" id="skip-btn">
+            <span class="act-icon">⏭</span>
+            <span>スキップ</span>
+            <span class="act-sub">今日は違う</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- AIチャットストリップ（Bootstrap card + form-control） -->
+      <div class="px-3 mb-3">
+        <p class="text-uppercase fw-bold text-muted mb-2" style="font-size:10.5px; letter-spacing:.07em;">💬 コンシェルジュに話す</p>
+        <div class="card border" style="border-color:rgba(124,58,237,.14)!important; border-radius:18px;">
+          <div class="card-body p-3">
+            <div class="d-flex flex-column gap-2 mb-2 overflow-auto" style="max-height:180px;" id="chat-mini-msgs">
+              <div class="msg msg-ai">こんにちは！今日はどんな気分ですか？時間と気分を教えてくれると、ぴったりの1本をご提案します🎮</div>
+              <div class="msg msg-user">30分くらいしかない、疲れてる</div>
+              <div class="msg msg-ai">では「スプラトゥーン3」のサーモンランがぴったりです！30分でサクッと楽しめますよ🐟</div>
+            </div>
+            <div class="d-flex gap-2 align-items-center">
+              <input type="text" id="mini-chat-input" class="form-control form-control-sm rounded-pill"
+                style="background:var(--c-bg); border-color:rgba(124,58,237,.22);"
+                placeholder="「スカッとしたい」「2時間ある」など…">
+              <button class="send-btn" id="mini-chat-send"><i class="bi bi-send-fill"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- リストプレビュー（Bootstrap card） -->
+      <div class="px-3 mb-3">
+        <p class="text-uppercase fw-bold text-muted mb-2" style="font-size:10.5px; letter-spacing:.07em;">📋 最近の積みゲー</p>
+
+        <div class="card border mb-2 game-item" style="border-color:rgba(0,0,0,.06)!important; border-radius:14px;">
+          <div class="card-body d-flex align-items-center gap-2 py-2 px-3">
+            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;background:var(--c-purple-lt);font-size:18px;">🐉</div>
+            <div class="flex-grow-1" style="min-width:0;">
+              <div class="fw-semibold text-truncate" style="font-size:12.5px;">モンスターハンター ワイルズ</div>
+              <div class="text-muted" style="font-size:10.5px;">アクションRPG • PS5</div>
+            </div>
+            <span class="badge rounded-2" style="background:#F3F4F6;color:#6B7280;font-size:9.5px;">未開封</span>
+          </div>
+        </div>
+
+        <div class="card border mb-2 game-item" style="border-color:rgba(0,0,0,.06)!important; border-radius:14px;">
+          <div class="card-body d-flex align-items-center gap-2 py-2 px-3">
+            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;background:var(--c-purple-lt);font-size:18px;">🃏</div>
+            <div class="flex-grow-1" style="min-width:0;">
+              <div class="fw-semibold text-truncate" style="font-size:12.5px;">ペルソナ5 ロイヤル</div>
+              <div class="text-muted" style="font-size:10.5px;">JRPG • Switch</div>
+            </div>
+            <span class="badge rounded-2" style="background:#FEE2E2;color:#DC2626;font-size:9.5px;">中断中</span>
+          </div>
+        </div>
+
+        <div class="card border mb-2 game-item" style="border-color:rgba(0,0,0,.06)!important; border-radius:14px;">
+          <div class="card-body d-flex align-items-center gap-2 py-2 px-3">
+            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;background:var(--c-purple-lt);font-size:18px;">🌊</div>
+            <div class="flex-grow-1" style="min-width:0;">
+              <div class="fw-semibold text-truncate" style="font-size:12.5px;">スプラトゥーン3</div>
+              <div class="text-muted" style="font-size:10.5px;">シューター • Switch</div>
+            </div>
+            <span class="badge rounded-2" style="background:#D1FAE5;color:#059669;font-size:9.5px;">プレイ中</span>
+          </div>
+        </div>
+
+        <div class="text-center py-1">
+          <button class="f-chip" onclick="switchTab('list')">すべて見る <i class="bi bi-arrow-right"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         リストタブ
+    =========================================== -->
+    <div id="tab-list" class="tab-pane">
+
+      <!-- PCのみ: ヘッダー -->
+      <div class="d-none d-md-flex align-items-center justify-content-between px-3 pt-4 pb-3">
+        <h5 class="fw-bold mb-0">積みゲーリスト</h5>
+        <button class="btn btn-sm text-white" style="background:var(--c-purple);">+ ゲームを追加</button>
+      </div>
+
+      <div class="px-3">
+        <!-- 検索（Bootstrap form-control） -->
+        <input type="text" class="form-control form-control-sm rounded-pill mb-2"
+          style="background:#fff; border-color:rgba(124,58,237,.22);" placeholder="🔍  ゲームを検索…">
+
+        <!-- フィルターチップ（横スクロール） -->
+        <div class="d-flex gap-2 overflow-auto pb-2 mb-3">
+          <button class="f-chip active">すべて</button>
+          <button class="f-chip">未開封</button>
+          <button class="f-chip">序盤で放置</button>
+          <button class="f-chip">中断中</button>
+          <button class="f-chip">プレイ中</button>
+          <button class="f-chip">クリア済み</button>
+        </div>
+
+        <!-- ゲームリスト（Bootstrap card） -->
+        <div class="card border mb-2 game-item" style="border-color:rgba(0,0,0,.06)!important; border-radius:14px;">
+          <div class="card-body d-flex align-items-center gap-2 py-2 px-3">
+            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;background:var(--c-purple-lt);font-size:18px;">🗡️</div>
+            <div class="flex-grow-1" style="min-width:0;">
+              <div class="fw-semibold text-truncate" style="font-size:12.5px;">ゼルダの伝説 ティアーズ オブ ザ キングダム</div>
+              <div class="text-muted" style="font-size:10.5px;">アドベンチャー • Switch • 2023年5月購入</div>
+            </div>
+            <span class="badge rounded-2" style="background:var(--c-gold-lt);color:var(--c-gold);font-size:9.5px;">序盤で放置</span>
+          </div>
+        </div>
+
+        <div class="card border mb-2 game-item" style="border-color:rgba(0,0,0,.06)!important; border-radius:14px;">
+          <div class="card-body d-flex align-items-center gap-2 py-2 px-3">
+            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;background:var(--c-purple-lt);font-size:18px;">🐉</div>
+            <div class="flex-grow-1" style="min-width:0;">
+              <div class="fw-semibold text-truncate" style="font-size:12.5px;">モンスターハンター ワイルズ</div>
+              <div class="text-muted" style="font-size:10.5px;">アクションRPG • PS5 • 2025年2月購入</div>
+            </div>
+            <span class="badge rounded-2" style="background:#F3F4F6;color:#6B7280;font-size:9.5px;">未開封</span>
+          </div>
+        </div>
+
+        <div class="card border mb-2 game-item" style="border-color:rgba(0,0,0,.06)!important; border-radius:14px;">
+          <div class="card-body d-flex align-items-center gap-2 py-2 px-3">
+            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;background:var(--c-purple-lt);font-size:18px;">🃏</div>
+            <div class="flex-grow-1" style="min-width:0;">
+              <div class="fw-semibold text-truncate" style="font-size:12.5px;">ペルソナ5 ロイヤル</div>
+              <div class="text-muted" style="font-size:10.5px;">JRPG • Switch • 2022年10月購入</div>
+            </div>
+            <span class="badge rounded-2" style="background:#FEE2E2;color:#DC2626;font-size:9.5px;">中断中</span>
+          </div>
+        </div>
+
+        <div class="card border mb-2 game-item" style="border-color:rgba(0,0,0,.06)!important; border-radius:14px;">
+          <div class="card-body d-flex align-items-center gap-2 py-2 px-3">
+            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;background:var(--c-purple-lt);font-size:18px;">🌊</div>
+            <div class="flex-grow-1" style="min-width:0;">
+              <div class="fw-semibold text-truncate" style="font-size:12.5px;">スプラトゥーン3</div>
+              <div class="text-muted" style="font-size:10.5px;">シューター • Switch • 2022年9月購入</div>
+            </div>
+            <span class="badge rounded-2" style="background:#D1FAE5;color:#059669;font-size:9.5px;">プレイ中</span>
+          </div>
+        </div>
+
+        <div class="card border mb-2 game-item" style="border-color:rgba(0,0,0,.06)!important; border-radius:14px;">
+          <div class="card-body d-flex align-items-center gap-2 py-2 px-3">
+            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;background:var(--c-purple-lt);font-size:18px;">🌸</div>
+            <div class="flex-grow-1" style="min-width:0;">
+              <div class="fw-semibold text-truncate" style="font-size:12.5px;">あつまれ どうぶつの森</div>
+              <div class="text-muted" style="font-size:10.5px;">シミュレーション • Switch • 2020年3月購入</div>
+            </div>
+            <span class="badge rounded-2" style="background:var(--c-gold-lt);color:var(--c-gold);font-size:9.5px;">序盤で放置</span>
+          </div>
+        </div>
+
+        <div class="card border mb-2 game-item" style="border-color:rgba(0,0,0,.06)!important; border-radius:14px;">
+          <div class="card-body d-flex align-items-center gap-2 py-2 px-3">
+            <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;background:var(--c-purple-lt);font-size:18px;">💀</div>
+            <div class="flex-grow-1" style="min-width:0;">
+              <div class="fw-semibold text-truncate" style="font-size:12.5px;">Elden Ring</div>
+              <div class="text-muted" style="font-size:10.5px;">アクションRPG • PS5 • 2022年2月購入</div>
+            </div>
+            <span class="badge rounded-2" style="background:#F3F4F6;color:#6B7280;font-size:9.5px;">未開封</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         チャットタブ（スマホ専用）
+    =========================================== -->
+    <div id="tab-chat" class="tab-pane">
+      <div class="px-3 mb-3">
+        <p class="text-uppercase fw-bold text-muted mb-2" style="font-size:10.5px; letter-spacing:.07em;">💬 AIコンシェルジュ</p>
+        <div class="card border overflow-hidden" style="border-color:rgba(124,58,237,.14)!important; border-radius:18px;">
+          <!-- ペルソナ切り替え -->
+          <div class="d-flex gap-2 p-2 border-bottom overflow-auto">
+            <button class="p-chip active">🎩 執事</button>
+            <button class="p-chip">🎮 ゲーマー仲間</button>
+            <button class="p-chip">🧚 妖精</button>
+          </div>
+          <!-- メッセージ -->
+          <div class="d-flex flex-column gap-2 p-3 overflow-auto" style="height:340px;" id="chat-full-msgs">
+            <div class="msg msg-ai" style="font-size:11px;">ご帰還なさいませ。本日はどのようなゲーム体験をご所望でしょうか？</div>
+            <div class="msg msg-user" style="font-size:11px;">2時間あります。スカッとしたい</div>
+            <div class="msg msg-ai" style="font-size:11px;">承知いたしました。「スプラトゥーン3」のナワバリバトルが最適かと存じます！</div>
+            <div class="d-flex flex-wrap gap-1 pt-1">
+              <button class="p-chip" onclick="quickReply(this,'chat-input','chat-send','chat-full-msgs')">操作方法を見る</button>
+              <button class="p-chip" onclick="quickReply(this,'chat-input','chat-send','chat-full-msgs')">あらすじを教えて</button>
+              <button class="p-chip" onclick="quickReply(this,'chat-input','chat-send','chat-full-msgs')">別のゲームは？</button>
+            </div>
+          </div>
+          <!-- 入力欄（Bootstrap form-control） -->
+          <div class="d-flex gap-2 align-items-center p-2 border-top">
+            <input type="text" id="chat-input" class="form-control form-control-sm rounded-pill"
+              style="background:var(--c-bg); border-color:rgba(124,58,237,.22);"
+              placeholder="「今から2時間暇」「疲れてる」など…">
+            <button class="send-btn" id="chat-send"><i class="bi bi-send-fill"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         積みゲー城タブ
+    =========================================== -->
+    <div id="tab-castle" class="tab-pane">
+      <div class="px-3 mb-3">
+
+        <!-- PCのみ: ヘッダー -->
+        <div class="d-none d-md-flex align-items-center pt-2 pb-3">
+          <h5 class="fw-bold mb-0">積みゲー城</h5>
+        </div>
+
+        <!-- 城カード（Bootstrap rounded-4 + progressで代替） -->
+        <div class="rounded-4 text-center p-4 mb-3" style="background:linear-gradient(145deg, var(--c-purple-lt), var(--c-gold-lt));">
+          <div style="font-size:72px; line-height:1; display:block; margin-bottom:12px;" id="castle-emoji">🏚️</div>
+          <div class="fw-bold mb-1" style="font-size:16px;">城のHP: <span id="castle-hp">48</span>%</div>
+          <div class="text-muted mb-3" style="font-size:12px;">積みゲーを消化して城を修復しよう！あと6本クリアで完全復活 🏰</div>
+          <!-- Bootstrap progress コンポーネント -->
+          <div class="progress" style="height:10px; border-radius:10px;">
+            <div class="progress-bar" id="castle-prog" style="width:48%; background:var(--c-purple);"></div>
+          </div>
+        </div>
+
+        <!-- 実績（Bootstrap row row-cols-3） -->
+        <p class="text-uppercase fw-bold text-muted mb-2" style="font-size:10.5px; letter-spacing:.07em;">🏆 獲得した実績</p>
+        <div class="row row-cols-3 g-2">
+          <div class="col">
+            <div class="card border text-center py-3" style="border-radius:12px;">
+              <div style="font-size:24px;">⚔️</div>
+              <div class="text-muted mt-1" style="font-size:10px;">初クリア</div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card border text-center py-3" style="border-radius:12px;">
+              <div style="font-size:24px;">📚</div>
+              <div class="text-muted mt-1" style="font-size:10px;">5本クリア</div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card border text-center py-3" style="border-radius:12px;">
+              <div style="font-size:24px;">🎯</div>
+              <div class="text-muted mt-1" style="font-size:10px;">連続3日</div>
+            </div>
+          </div>
+          <div class="col opacity-25">
+            <div class="card border border-dashed text-center py-3" style="border-radius:12px; border-style:dashed!important;">
+              <div style="font-size:24px;">🔥</div>
+              <div class="text-muted mt-1" style="font-size:10px;">10本クリア</div>
+            </div>
+          </div>
+          <div class="col opacity-25">
+            <div class="card border text-center py-3" style="border-radius:12px; border-style:dashed!important;">
+              <div style="font-size:24px;">👑</div>
+              <div class="text-muted mt-1" style="font-size:10px;">城の王</div>
+            </div>
+          </div>
+          <div class="col opacity-25">
+            <div class="card border text-center py-3" style="border-radius:12px; border-style:dashed!important;">
+              <div style="font-size:24px;">💎</div>
+              <div class="text-muted mt-1" style="font-size:10px;">全クリア</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         プロフィールタブ
+    =========================================== -->
+    <div id="tab-profile" class="tab-pane">
+      <div class="px-3">
+
+        <!-- PCのみ: ヘッダー -->
+        <div class="d-none d-md-flex align-items-center pt-2 pb-3">
+          <h5 class="fw-bold mb-0">プロフィール</h5>
+        </div>
+
+        <!-- アバター（Bootstrap rounded-circle） -->
+        <div class="text-center mb-3 pt-2">
+          <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2 fw-bold"
+            style="width:68px; height:68px; background:var(--c-purple); color:#fff; font-size:26px;">由</div>
+          <div class="fw-bold" style="font-size:16px;">蒲山 由梨花</div>
+          <div class="text-muted mt-1" style="font-size:12px;">ゲーマー歴 10年 ・ 2024年4月登録</div>
+          <div class="mt-2">
+            <span class="badge rounded-pill fw-semibold" style="background:var(--c-purple-lt); color:var(--c-purple);">⭐ 480 pt</span>
+          </div>
+        </div>
+
+        <!-- 統計（Bootstrap list-group） -->
+        <p class="text-uppercase fw-bold text-muted mb-2" style="font-size:10.5px; letter-spacing:.07em;">📊 統計</p>
+        <ul class="list-group list-group-flush rounded-3 mb-3 border">
+          <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+            <span class="text-muted small">積みゲー総数</span>
+            <span class="fw-semibold">24本</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+            <span class="text-muted small">クリア済み</span>
+            <span class="fw-semibold text-success">12本</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+            <span class="text-muted small">プレイ中</span>
+            <span class="fw-semibold">3本</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+            <span class="text-muted small">消化率</span>
+            <span class="fw-semibold">33%</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+            <span class="text-muted small">今月クリア</span>
+            <span class="fw-semibold">2本</span>
+          </li>
+        </ul>
+
+        <!-- 設定（Bootstrap list-group） -->
+        <p class="text-uppercase fw-bold text-muted mb-2" style="font-size:10.5px; letter-spacing:.07em;">⚙️ 設定</p>
+        <ul class="list-group list-group-flush rounded-3 mb-3 border">
+          <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+            <span class="text-muted small">AIペルソナ</span>
+            <span class="fw-semibold">🎩 執事</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+            <span class="text-muted small">通知</span>
+            <span class="fw-semibold">ON</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center py-2 text-danger" style="cursor:pointer;">
+            <span>ログアウト</span>
+            <i class="bi bi-box-arrow-right"></i>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!-- /tab-content-wrap -->
+</div><!-- /app-wrapper -->
+
+<!-- =====================================================
+     PC 右チャットパネル
+====================================================== -->
+<aside class="pc-chat-panel">
+  <div class="d-flex align-items-center gap-2 px-3 py-3 border-bottom">
+    <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+      style="width:30px; height:30px; background:var(--c-purple); color:#fff; font-size:14px;">
+      <i class="bi bi-robot"></i>
+    </div>
+    <div>
+      <div class="fw-bold" style="font-size:13px;">AIコンシェルジュ</div>
+      <div class="text-success" style="font-size:10px;">● オンライン</div>
+    </div>
+  </div>
+  <div class="d-flex gap-2 p-2 border-bottom overflow-auto">
+    <button class="p-chip active">🎩 執事</button>
+    <button class="p-chip">🎮 ゲーマー仲間</button>
+    <button class="p-chip">🧚 妖精</button>
+  </div>
+  <div class="pc-chat-msgs" id="pc-chat-msgs">
+    <div class="msg msg-ai" style="font-size:11px;">ご帰還なさいませ。本日はどのようなゲーム体験をご所望でしょうか？</div>
+    <div class="msg msg-user" style="font-size:11px;">2時間あります。スカッとしたい</div>
+    <div class="msg msg-ai" style="font-size:11px;">承知いたしました。スプラトゥーン3のナワバリバトルが最適かと存じます！</div>
+    <div class="d-flex flex-wrap gap-1 pt-1">
+      <button class="p-chip" onclick="quickReply(this,'pc-chat-input','pc-chat-send','pc-chat-msgs')">操作方法を見る</button>
+      <button class="p-chip" onclick="quickReply(this,'pc-chat-input','pc-chat-send','pc-chat-msgs')">あらすじを教えて</button>
+      <button class="p-chip" onclick="quickReply(this,'pc-chat-input','pc-chat-send','pc-chat-msgs')">別のゲームは？</button>
+    </div>
+  </div>
+  <div class="d-flex gap-2 align-items-center p-2 border-top">
+    <input class="pc-chat-input" id="pc-chat-input" type="text" placeholder="「スカッとしたい」「疲れてる」など…">
+    <button class="send-btn" id="pc-chat-send"><i class="bi bi-send-fill"></i></button>
+  </div>
+</aside>
+
+<!-- =====================================================
+     スマホ ボトムナビ
+====================================================== -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-tab="home"><i class="bi bi-house-fill"></i><span>ホーム</span></button>
+  <button class="nav-btn" data-tab="list"><i class="bi bi-collection"></i><span>リスト</span></button>
+  <button class="nav-btn" data-tab="chat"><i class="bi bi-chat-heart"></i><span>チャット</span></button>
+  <button class="nav-btn" data-tab="castle"><i class="bi bi-buildings"></i><span>城</span></button>
+  <button class="nav-btn" data-tab="profile"><i class="bi bi-person-circle"></i><span>プロフィール</span></button>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
