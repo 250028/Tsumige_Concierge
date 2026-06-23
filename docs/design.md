@@ -171,3 +171,25 @@ users (1) ──< chat_logs (多) ← ユーザーは複数のチャット履歴
 - スマホ優先で実装し、`@media (min-width: 768px)` でPC用レイアウトを上書き
 - Next.js + CSS Modules（または Tailwind）で管理
 - ボトムタブは PC では `display: none`、サイドバーはスマホでは `display: none`
+
+
+## 使う技術スタックと、その理由
+
+| 層 | 技術 |
+|---|---|
+| フロントエンド | Next.js (App Router) + TypeScript |
+| CSS | Tailwind CSS v4 |
+| バックエンド | Next.js API Routes（同一プロジェクト） |
+| ORM | Prisma |
+| データベース | MySQL |
+| AI | Gemini API |
+| 開発環境 | Node.js + npm/pnpm・VSCode・GitHub |
+
+### 採用理由
+- Next.js：フロントとAPIを1プロジェクトで管理でき、初学者にシンプルな構成になるため
+- TypeScript：型安全により実装ミスを早期発見できるため
+- Tailwind CSS：`md:` ブレークポイントでスマホ・PCのレスポンシブ対応が書きやすいため
+- Prisma：schema.prismaでテーブル設計を一元管理でき、SQLを直接書かずTypeScriptで
+  DB操作できるため。`npx prisma migrate dev` でMySQLのテーブル自動生成も可能
+- MySQL：授業で学んだ技術を活かせる・リレーショナル設計に適しているため
+- Gemini API：テキスト生成・チャット両対応で、無料枠が充実しているため
