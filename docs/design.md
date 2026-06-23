@@ -61,6 +61,18 @@
 [ゲーム詳細] ← 戻る → [リスト一覧]
 
 [ホーム] → ＋ボタン → [ゲーム登録] → 保存 → [ホーム]
+
+[ホーム] → 「今すぐプレイ」ボタン → [AIチャット画面（プレイモード）]
+        ↓ AIが「準備できたらスタートを押してね🎮」と話しかける
+   [スタートボタン] → タイマー開始 & started_at をDBに保存
+        ↓ ゲームをプレイ中…
+   [ストップボタン] → タイマー停止 & stopped_at・duration_minutes を自動計算
+        ↓
+   「どこまでやった？」入力欄が表示される（progress_note を更新）
+        ↓ 「報告する」ボタン
+   AIが「お疲れ様！今日は◯分プレイしたね！🎉」と応答
+        ↓
+   ゲーム詳細画面のtotal_play_time・last_played_at・progress_noteが自動更新
 ```
 
 ### 遷移のポイント
@@ -68,6 +80,8 @@
 - ゲーム詳細画面は「< 戻る」でリスト一覧に戻る
 - ゲーム登録・編集画面は「キャンセル」で元の画面に戻る
 - 3タップ以内で目的の操作に到達できるよう設計
+- 「今すぐプレイ」押下時はAIチャット画面がプレイモードに切り替わり、タイマーUIを表示する
+- タイマーはブラウザを閉じても正確に計測できるよう、started_atをDBに保存し「現在時刻 − started_at」で経過時間を再計算する方式を採用
 
 ---
 
@@ -135,6 +149,8 @@
 | status | ENUM | 未開封 / 序盤で放置 / 中断中 / プレイ中 / クリア済み |
 | progress_note | TEXT | 進捗メモ（「第3の祠まで終了」など） |
 | purchase_date | DATE | 購入日 |
+| total_play_time | INT | 累計プレイ時間（分） |
+| last_played_at | DATETIME | 最後にプレイした日時 |
 | created_at | DATETIME | 登録日時 |
 | updated_at | DATETIME | 更新日時 |
 
@@ -147,10 +163,23 @@
 | message | TEXT | メッセージ内容 |
 | created_at | DATETIME | 送信日時 |
 
+### `play_sessions` テーブル（新規追加）
+| カラム名 | 型 | 説明 |
+|---|---|---|
+| id | INT (PK) | セッションID |
+| user_id | INT (FK) | ユーザー |
+| game_id | INT (FK) | ゲーム |
+| started_at | DATETIME | スタートボタンを押した日時 |
+| stopped_at | DATETIME | ストップボタンを押した日時 |
+| duration_minutes | INT | プレイ時間（分・自動計算） |
+| progress_note | TEXT | 「第4の祠まで」などのプレイ後メモ |
+
 ### テーブル間のリレーション
 ```
-users (1) ──< games (多)     ← ユーザーは複数の積みゲーを持つ
-users (1) ──< chat_logs (多) ← ユーザーは複数のチャット履歴を持つ
+users (1) ──< games (多)         ← ユーザーは複数の積みゲーを持つ
+users (1) ──< chat_logs (多)     ← ユーザーは複数のチャット履歴を持つ
+users (1) ──< play_sessions (多) ← ユーザーは複数のプレイ記録を持つ
+games (1) ──< play_sessions (多) ← 1本のゲームに複数のプレイ記録がつく
 ```
 
 ---
@@ -165,25 +194,3 @@ users (1) ──< chat_logs (多) ← ユーザーは複数のチャット履歴
 - スマホ優先で実装し、`@media (min-width: 768px)` でPC用レイアウトを上書き
 - Next.js + CSS Modules（または Tailwind）で管理
 - ボトムタブは PC では `display: none`、サイドバーはスマホでは `display: none`
-
-
-## 使う技術スタックと、その理由
-
-| 層 | 技術 |
-|---|---|
-| フロントエンド | Next.js (App Router) + TypeScript |
-| CSS | Tailwind CSS v4 |
-| バックエンド | Next.js API Routes（同一プロジェクト） |
-| ORM | Prisma |
-| データベース | MySQL |
-| AI | Gemini API |
-| 開発環境 | Node.js + npm/pnpm・VSCode・GitHub |
-
-### 採用理由
-- Next.js：フロントとAPIを1プロジェクトで管理でき、初学者にシンプルな構成になるため
-- TypeScript：型安全により実装ミスを早期発見できるため
-- Tailwind CSS：`md:` ブレークポイントでスマホ・PCのレスポンシブ対応が書きやすいため
-- Prisma：schema.prismaでテーブル設計を一元管理でき、SQLを直接書かずTypeScriptで
-  DB操作できるため。`npx prisma migrate dev` でMySQLのテーブル自動生成も可能
-- MySQL：授業で学んだ技術を活かせる・リレーショナル設計に適しているため
-- Gemini API：テキスト生成・チャット両対応で、無料枠が充実しているため
