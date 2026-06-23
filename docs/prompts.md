@@ -1,10 +1,6 @@
 # AIプロンプト記録
 
-## 学籍番号
-250028
 
-## 氏名
-蒲山 由梨花
 
 ## 使ったAIツール
 Claude（Anthropic） / Google AI Studio（Gemini API のプロンプト調整）
