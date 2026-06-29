@@ -280,4 +280,17 @@ const games = await prisma.game.findMany({ where: { userId: 1 } })
 - `npx prisma db push` でテーブル作成
 - 最初の目標：「データ1件取得できる API を作って動作確認」
 
+#### 決まっていないこと
+
+- .env.local の API キーがまだ未設定（Gemini API キー・RAWG API キー・SESSION_SECRET）
+- Laragon の MySQL タイムゾーン設定（my.ini への追記）がまだ未実施
+
+#### 不明点・技術的な懸念
+
+schema.sql（MySQL 直接実行用）と schema.prisma（Prisma 管理用）の2つが存在することになるが、実装を進めると schema.prisma が正となり schema.sql は参考資料扱いになる予定。この切り替えのタイミングをどうするか
+RAWG API でジャンル名が英語で返ってくるため、日本語化マッピングを自前で作る必要があるが、どこまで対応するか（対応ジャンル数）が未定
+Gemini API の無料枠の上限を超えた場合の代替手段を決めていない
+
+---
+
 ### 次週
