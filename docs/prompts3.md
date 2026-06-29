@@ -269,6 +269,8 @@ const games = await prisma.game.findMany({ where: { userId: 1 } })
 - `create-next-app` はフォルダ名を npm パッケージ名として使うため、**大文字・アンダースコアが使えない**（フォルダ名は小文字・ハイフン推奨）
 - ファイルを `-Force` で移動・上書きするときは**既存の重要ファイルが消えないか事前に確認**する必要がある
 
+### 火曜日
+
 ---
 
 ## 次回やること
@@ -277,3 +279,5 @@ const games = await prisma.game.findMany({ where: { userId: 1 } })
 - Prisma の設定（`npx prisma init` → `schema.prisma` を書く）
 - `npx prisma db push` でテーブル作成
 - 最初の目標：「データ1件取得できる API を作って動作確認」
+
+### 次週
