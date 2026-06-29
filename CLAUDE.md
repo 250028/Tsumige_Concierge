@@ -71,6 +71,7 @@ tsumige-concierge/
 | avatar_url | VARCHAR(255) | プロフィール画像パス |
 | persona_type | ENUM | butler / gamer / fairy |
 | points | INT | 累計ポイント |
+| gaming_since | YEAR | ゲームを始めた年（ゲーマー歴計算用） |
 | created_at | DATETIME | 登録日時 |
 
 ### `games` テーブル（中心テーブル）
@@ -84,10 +85,12 @@ tsumige-concierge/
 | status | ENUM | 未開封/序盤で放置/中断中/プレイ中/クリア済み |
 | cover_image_url | VARCHAR(255) | カバー画像URL |
 | rawg_id | INT | RAWG APIのゲームID |
+| estimated_playtime | INT | 推定クリア時間（時間単位・RAWG APIのplaytime） |
 | progress_note | TEXT | 進捗メモ |
 | purchase_date | DATE | 購入日 |
 | total_play_time | INT | 累計プレイ時間（分） |
 | last_played_at | DATETIME | 最終プレイ日時 |
+| cleared_at | DATETIME | クリア済みにした日時（今月クリア集計用） |
 | created_at | DATETIME | 登録日時 |
 | updated_at | DATETIME | 更新日時 |
 
@@ -110,6 +113,23 @@ tsumige-concierge/
 | stopped_at | DATETIME | ストップ日時 |
 | duration_minutes | INT | プレイ時間（分・自動計算） |
 | progress_note | TEXT | プレイ後メモ |
+
+### `achievements` テーブル（実績マスター）
+| カラム | 型 | 説明 |
+|---|---|---|
+| id | INT (PK) | 実績ID |
+| name | VARCHAR(100) | 実績名 |
+| icon | VARCHAR(10) | アイコン絵文字 |
+| description | VARCHAR(255) | 説明文 |
+| condition_key | VARCHAR(50) | 達成判定キー（UNIQUE） |
+
+### `user_achievements` テーブル
+| カラム | 型 | 説明 |
+|---|---|---|
+| id | INT (PK) | レコードID |
+| user_id | INT (FK) | ユーザー |
+| achievement_id | INT (FK) | 実績 |
+| achieved_at | DATETIME | 取得日時 |
 
 ---
 
@@ -180,6 +200,9 @@ tsumige-concierge/
 - `docs/モック画面設計.md` - モック画面設計
 - `docs/prompts.md` - AIプロンプト記録①
 - `docs/prompts2.md` - AIプロンプト記録②
+- `docs/prompts3.md` - AIプロンプト記録③
+- `docs/database_definition.md` - データベース定義書
+- `schema.sql` - MySQL DDL
 
 ---
 
@@ -280,11 +303,3 @@ npm install bcryptjs iron-session
 - カラー: 紫系（#7C3AED）をprimary、ゴールド（#D97706）をアクセントに
 - モックは `mock/index.html` を参照（Bootstrap 5 + Bootstrap Icons で作成済み）
 - 本実装はモックのレイアウトをそのまま活かしてTailwindで再現する
-
----
-
-## 開発の進め方
-
-- 実装前に必ず方針を確認してから進める
-- RAWGがない状態でも動くように設計し、後から段階的に追加する
-- 最初のゴール：「Laragon起動 → MySQL接続 → データ1件取得」を確認してから本実装へ
