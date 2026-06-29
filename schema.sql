@@ -252,13 +252,13 @@ INSERT INTO achievements (name, icon, description, condition_key) VALUES
 --  サンプルデータ（動作確認用）
 -- =====================================================================
 --  ⚠️ 本番環境では実行しないこと。開発・テスト専用。
---  テストユーザーのパスワードは「password123」を bcryptjs でハッシュ化した値。
+--  テストユーザーのパスワードは「test111」を bcryptjs でハッシュ化した値。
 -- =====================================================================
 
 -- テストユーザー
 INSERT INTO users (name, email, password, persona_type, points, gaming_since) VALUES
   ('由梨花', 'test@example.com',
-   '$2b$10$xOPMk5aQcQg1EEnBTdpjHe7JaCxPa2Tq0EtWHDo2RJPXg5X5Bpf7i',
+   '$2b$10$4U0PtAJA4Bw9DcfIlrDfpOszg9NlokxnMN9o18CXxhF784Jnw/hR.',
    'butler', 480, 2014);
 
 -- 積みゲーリスト（モックの6本）
