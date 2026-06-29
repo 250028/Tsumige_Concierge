@@ -260,7 +260,7 @@ const games = await prisma.game.findMany({ where: { userId: 1 } })
 ---
 
 ## 今日気づいたこと・学んだこと
-
+### 月曜日
 - モックを作っていても、実際にSQL化してみると**保存先のないデータ**が見つかる。画面 ↔ カラムの対応表を先に作っておくと抜け漏れが防げる
 - `updated_at` はあらゆる更新で変わってしまうため、**特定のイベント（クリアした日時など）は専用カラムで追う**必要がある
 - 計算して求める値（消化率・城のHP）は**DBに保存しない**のが原則。保存するとデータがズレたとき整合性の確保が大変になる
@@ -272,7 +272,7 @@ const games = await prisma.game.findMany({ where: { userId: 1 } })
 ---
 
 ## 次回やること
-
+### 火曜日
 - Laragon 起動 → MySQL 接続確認
 - Prisma の設定（`npx prisma init` → `schema.prisma` を書く）
 - `npx prisma db push` でテーブル作成
