@@ -11,6 +11,9 @@
 --    - games          : cleared_at を追加（プロフィール統計の「今月クリア N本」を正確に集計するため）
 --    - play_sessions  : created_at と started_at の役割の違いをコメントで明記
 --    - games.total_play_time : play_sessions との同期が必要な点をコメントで明記
+--  v3 (2026-06-29)
+--    - インデックス追加（検索・フィルター・ソートの高速化）
+--    - 動作確認用サンプルデータ（テストユーザー・ゲーム6本・チャット履歴）を追加
 --
 -- =====================================================================
 
@@ -214,6 +217,26 @@ CREATE TABLE IF NOT EXISTS user_achievements (
 
 
 -- =====================================================================
+--  インデックス
+-- =====================================================================
+--  InnoDB は FOREIGN KEY に自動でインデックスを付ける。
+--  ここでは「FK 以外でよく使う検索・フィルター・ソート」のカラムに追加する。
+--
+--  games テーブル
+--    ・status      : リスト画面のフィルターチップで WHERE status = '...' を多用する
+--    ・cleared_at  : プロフィールの「今月クリア N本」で WHERE cleared_at BETWEEN ... を使う
+--    ・last_played_at : ホーム画面の「最近の積みゲー」で ORDER BY last_played_at DESC を使う
+--
+--  chat_logs テーブル
+--    ・created_at  : チャット履歴を時系列で取得するとき ORDER BY created_at ASC を使う
+-- =====================================================================
+CREATE INDEX idx_games_status         ON games     (status);
+CREATE INDEX idx_games_cleared_at     ON games     (cleared_at);
+CREATE INDEX idx_games_last_played_at ON games     (last_played_at);
+CREATE INDEX idx_chat_logs_created_at ON chat_logs (created_at);
+
+
+-- =====================================================================
 --  初期データ — 実績マスター（モックの積みゲー城タブより）
 -- =====================================================================
 INSERT INTO achievements (name, icon, description, condition_key) VALUES
@@ -223,6 +246,35 @@ INSERT INTO achievements (name, icon, description, condition_key) VALUES
   ('10本クリア', '🔥', '累計10本のゲームをクリアした',          'ten_clears'),
   ('城の王',     '👑', 'クリア率が80%を超えた',                 'castle_king'),
   ('全クリア',   '💎', '登録した全ゲームをクリアした',           'all_clear');
+
+
+-- =====================================================================
+--  サンプルデータ（動作確認用）
+-- =====================================================================
+--  ⚠️ 本番環境では実行しないこと。開発・テスト専用。
+--  テストユーザーのパスワードは「password123」を bcryptjs でハッシュ化した値。
+-- =====================================================================
+
+-- テストユーザー
+INSERT INTO users (name, email, password, persona_type, points, gaming_since) VALUES
+  ('由梨花', 'test@example.com',
+   '$2b$10$xOPMk5aQcQg1EEnBTdpjHe7JaCxPa2Tq0EtWHDo2RJPXg5X5Bpf7i',
+   'butler', 480, 2014);
+
+-- 積みゲーリスト（モックの6本）
+INSERT INTO games (user_id, title, genre, platform, status, estimated_playtime, purchase_date) VALUES
+  (1, 'ゼルダの伝説 ティアーズ オブ ザ キングダム', 'アドベンチャー', 'Switch', '序盤で放置', 60, '2023-05-12'),
+  (1, 'モンスターハンター ワイルズ',               'アクションRPG',  'PS5',    '未開封',     50, '2025-02-28'),
+  (1, 'ペルソナ5 ロイヤル',                        'JRPG',           'Switch', '中断中',    100, '2022-10-21'),
+  (1, 'スプラトゥーン3',                           'シューター',      'Switch', 'プレイ中',   NULL,'2022-09-09'),
+  (1, 'あつまれ どうぶつの森',                     'シミュレーション','Switch', '序盤で放置',  NULL,'2020-03-20'),
+  (1, 'Elden Ring',                                'アクションRPG',  'PS5',    '未開封',     60, '2022-02-25');
+
+-- チャット履歴（モックの会話）
+INSERT INTO chat_logs (user_id, role, message) VALUES
+  (1, 'assistant', 'ご帰還なさいませ。本日はどのようなゲーム体験をご所望でしょうか？'),
+  (1, 'user',      '2時間あります。スカッとしたい'),
+  (1, 'assistant', '承知いたしました。「スプラトゥーン3」のナワバリバトルが最適かと存じます！');
 
 
 -- =====================================================================

@@ -168,6 +168,19 @@ users (1) ──────────────────< games (多)
 
 ---
 
+## インデックス一覧
+
+> FOREIGN KEY カラム（`user_id` / `game_id` / `achievement_id`）は InnoDB が自動でインデックスを作成するため、ここには含めない。
+
+| インデックス名 | テーブル | カラム | 用途 |
+|---|---|---|---|
+| `idx_games_status` | `games` | `status` | リスト画面のフィルターチップ（`WHERE status = '...'`） |
+| `idx_games_cleared_at` | `games` | `cleared_at` | プロフィールの「今月クリア N本」集計（`WHERE cleared_at BETWEEN ...`） |
+| `idx_games_last_played_at` | `games` | `last_played_at` | ホームの「最近の積みゲー」表示（`ORDER BY last_played_at DESC`） |
+| `idx_chat_logs_created_at` | `chat_logs` | `created_at` | チャット履歴の時系列取得（`ORDER BY created_at ASC`） |
+
+---
+
 ## 画面 ↔ カラム 対応表
 
 | 画面 | 表示内容 | 参照先 |
