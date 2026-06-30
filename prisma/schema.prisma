@@ -1,0 +1,166 @@
+// =============================================================
+//  積みゲー・コンシェルジュ — Prisma スキーマ
+//  DB: MySQL 8.0+（Laragon）
+// =============================================================
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// =============================================================
+//  ENUM 定義
+// =============================================================
+
+// AIコンシェルジュのペルソナ種別
+enum PersonaType {
+  butler  // 執事
+  gamer   // ゲーマー仲間
+  fairy   // ゲームの妖精
+}
+
+// 積みゲーのステータス
+enum GameStatus {
+  未開封
+  序盤で放置
+  中断中
+  プレイ中
+  クリア済み
+}
+
+// チャットの発言者
+enum ChatRole {
+  user       // ユーザー発言
+  assistant  // AI返答
+}
+
+// =============================================================
+//  Model: User（ユーザー情報）
+// =============================================================
+model User {
+  id                  Int          @id @default(autoincrement())
+  name                String       @db.VarChar(100)
+  email               String       @unique @db.VarChar(255)
+  password            String       @db.VarChar(255)  // bcryptjs でハッシュ化して保存
+  avatarUrl           String?      @db.VarChar(255)
+  personaType         PersonaType  @default(butler)
+  points              Int          @default(0)
+  notificationEnabled Boolean      @default(true)
+  gamingSince         Int?         // YEAR型: 例) 2014 → ゲーマー歴計算に使用
+  createdAt           DateTime     @default(now())
+  updatedAt           DateTime     @updatedAt
+
+  // リレーション
+  games            Game[]
+  chatLogs         ChatLog[]
+  playSessions     PlaySession[]
+  userAchievements UserAchievement[]
+
+  @@map("users")
+}
+
+// =============================================================
+//  Model: Game（積みゲーマイリスト）
+// =============================================================
+model Game {
+  id                Int         @id @default(autoincrement())
+  userId            Int
+  title             String      @db.VarChar(255)
+  genre             String?     @db.VarChar(100)
+  platform          String?     @db.VarChar(50)
+  status            GameStatus  @default(未開封)
+  coverImageUrl     String?     @db.VarChar(255)
+  rawgId            Int?        // RAWG API のゲームID（手動登録時は NULL）
+  estimatedPlaytime Int?        // 単位: 時間（RAWG API の playtime フィールド）
+  progressNote      String?     @db.Text
+  purchaseDate      DateTime?   @db.Date
+  totalPlayTime     Int         @default(0)  // 単位: 分（play_sessions と同期必須）
+  lastPlayedAt      DateTime?
+  clearedAt         DateTime?   // クリア済みにした日時（今月クリア N本の集計用）
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  // リレーション
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playSessions PlaySession[]
+
+  @@index([status])        // リスト画面のフィルターチップ用
+  @@index([clearedAt])     // 今月クリア N本の集計用
+  @@index([lastPlayedAt])  // ホーム画面の「最近の積みゲー」ソート用
+  @@map("games")
+}
+
+// =============================================================
+//  Model: ChatLog（AIチャット履歴）
+// =============================================================
+model ChatLog {
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  role      ChatRole
+  message   String    @db.Text
+  createdAt DateTime  @default(now())
+
+  // リレーション
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])  // チャット履歴の時系列取得用
+  @@map("chat_logs")
+}
+
+// =============================================================
+//  Model: PlaySession（プレイセッション記録）
+// =============================================================
+model PlaySession {
+  id              Int       @id @default(autoincrement())
+  userId          Int
+  gameId          Int
+  startedAt       DateTime  // 「今すぐプレイ」ボタンを押した日時
+  stoppedAt       DateTime? // ストップボタンを押した日時（プレイ中は NULL）
+  durationMinutes Int?      // 停止後に自動計算して保存（単位: 分）
+  progressNote    String?   @db.Text
+  createdAt       DateTime  @default(now())
+
+  // リレーション
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@map("play_sessions")
+}
+
+// =============================================================
+//  Model: Achievement（実績マスターデータ）
+// =============================================================
+model Achievement {
+  id           Int    @id @default(autoincrement())
+  name         String @db.VarChar(100)
+  icon         String @db.VarChar(10)   // 絵文字（⚔️ 📚 🎯 など）
+  description  String @db.VarChar(255)
+  conditionKey String @unique @db.VarChar(50)  // アプリ側の達成判定キー
+
+  // リレーション
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+// =============================================================
+//  Model: UserAchievement（ユーザーの実績取得記録）
+// =============================================================
+model UserAchievement {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  achievementId Int
+  achievedAt    DateTime @default(now())
+
+  // リレーション
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  // 1ユーザー1実績1回のみ取得可能
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}

@@ -1,3 +1,4 @@
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
 import { PrismaClient } from '@prisma/client'
 
 // ---------------------------------------------------------------------------
@@ -10,10 +11,6 @@ import { PrismaClient } from '@prisma/client'
 //
 // 解決策：グローバル変数にインスタンスを保持し、
 //         すでに存在する場合はそれを再利用する（= シングルトン）。
-//
-// 【PHPの PDO クラスとの対応】
-//   PHP  : class Database { private static $instance = null; ... }
-//   Next : globalThis.__prisma ?? new PrismaClient()
 // ---------------------------------------------------------------------------
 
 // TypeScript にグローバル変数の型を教える
@@ -22,7 +19,20 @@ declare global {
   var __prisma: PrismaClient | undefined
 }
 
-const prisma = globalThis.__prisma ?? new PrismaClient()
+// Prisma 7 ではアダプターに接続オプションを直接渡す
+function createPrismaClient() {
+  const dbUrl   = new URL(process.env.DATABASE_URL!)
+  const adapter = new PrismaMariaDb({
+    host:     dbUrl.hostname,
+    port:     parseInt(dbUrl.port) || 3306,
+    user:     dbUrl.username,
+    password: dbUrl.password || undefined,
+    database: dbUrl.pathname.slice(1),
+  })
+  return new PrismaClient({ adapter })
+}
+
+const prisma = globalThis.__prisma ?? createPrismaClient()
 
 // 開発環境のみグローバルに保存（本番では毎回新規作成でよい）
 if (process.env.NODE_ENV !== 'production') {
