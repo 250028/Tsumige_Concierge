@@ -177,6 +177,83 @@ const adapter = new PrismaMariaDb({ host, user, password, database })
 
 ---
 
+## 6. チャレンジ
+
+### ① エラーを再現して解決
+
+`.env` の DATABASE_URL を意図的に壊してエラーを確認した。
+
+| 壊し方 | エラー内容 | 意味 |
+|---|---|---|
+| パスワードを `wrongpassword` に変更 | Access denied for user 'root' | 認証失敗。パスワードが違う |
+| DB名を `wrong_db` に変更 | Unknown database 'wrong_db' | 指定したDB名が存在しない |
+| ホストを `localhostt` に変更 | 接続タイムアウト | そのホストに到達できない |
+| ポートを `9999` に変更 | 接続できない | そのポートで MySQL が動いていない |
+
+確認後は元の値 `mysql://root:@localhost:3306/tsumige_db` に戻した。
+
+**学んだこと**：エラーメッセージは「何が間違っているか」を正確に教えてくれる。`Access denied` はパスワード、`Unknown database` はDB名、タイムアウトはホスト・ポートの問題と読み分けられる。
+
+---
+
+### ② 複数の接続方法を比較
+
+Next.js × MySQL の接続方法は主に3つある。
+
+| 方法 | 書き方のイメージ | 特徴 |
+|---|---|---|
+| **mysql2**（生SQL） | `connection.query("SELECT * FROM games")` | SQLをそのまま書く。自由度は高いが手間がかかる |
+| **Prisma**（今回） | `prisma.game.findMany()` | TypeScript で書ける。型補完・マイグレーション管理が便利 |
+| **Drizzle ORM** | `db.select().from(games)` | Prisma より軽量。書き方が SQL に近い |
+
+今回 Prisma を選んだ理由：
+- `schema.prisma` にテーブル定義を書くと TypeScript の型が自動生成される
+- `prisma migrate dev` でマイグレーション管理ができる
+- `prisma.user.count()` のように英語に近い感覚で書けて読みやすい
+
+---
+
+### ③ 接続処理の理解（lib/prisma.ts を自分の言葉で説明）
+
+```ts
+import { PrismaMariaDb } from '@prisma/adapter-mariadb'
+import { PrismaClient } from '@prisma/client'
+```
+→ Prisma を動かすために必要な部品を読み込む。`PrismaMariaDb` は「MySQL との通訳役（ドライバー）」、`PrismaClient` は「SQLを書かずにDBを操作できる道具」。
+
+```ts
+declare global {
+  var __prisma: PrismaClient | undefined
+}
+```
+→ TypeScript は知らない変数があるとエラーを出す。`globalThis.__prisma` という変数をこれから使うので、事前に「こういう変数があるよ」と宣言している。
+
+```ts
+function createPrismaClient() {
+  const dbUrl   = new URL(process.env.DATABASE_URL!)
+  const adapter = new PrismaMariaDb({
+    host:     dbUrl.hostname,  
+    port:     ...,             
+    user:     dbUrl.username,  
+    password: ...,             
+    database: ...,             
+  })
+  return new PrismaClient({ adapter })
+}
+```
+→ `.env` の `DATABASE_URL` を `new URL()` で分解して、`host`・`port`・`user`・`database` に分けてアダプターに渡す。PHP の `new PDO("mysql:host=localhost;dbname=...", $user, $pass)` と同じイメージ。
+
+```ts
+const prisma = globalThis.__prisma ?? createPrismaClient()
+
+if (process.env.NODE_ENV !== 'production') {
+  globalThis.__prisma = prisma
+}
+```
+→ `??` は「左が null または undefined なら右を使う」という演算子。一度作った接続を `globalThis`（アプリ全体で共有できる場所）に保存しておき、2回目以降は使い回す（シングルトン）。これをしないと Next.js のホットリロード（ファイル保存のたびの再読み込み）のたびに接続が増えすぎて「Too many connections」エラーになる。
+
+---
+
 ## 5. AIを使ってみて気づいたこと
 
 **うまくいった指示**
