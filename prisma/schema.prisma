@@ -43,6 +43,7 @@ enum ChatRole {
 // =============================================================
 model User {
   id                  Int          @id @default(autoincrement())
+  loginId             String       @unique @db.VarChar(50)   // ログインに使うID
   name                String       @db.VarChar(100)
   email               String       @unique @db.VarChar(255)
   password            String       @db.VarChar(255)  // bcryptjs でハッシュ化して保存
