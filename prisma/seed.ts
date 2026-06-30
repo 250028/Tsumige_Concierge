@@ -59,6 +59,7 @@ async function main() {
     where:  { email: 'test@example.com' },
     update: {},
     create: {
+      loginId:     'yurika',
       name:        '由梨花',
       email:       'test@example.com',
       password:    '$2b$10$4U0PtAJA4Bw9DcfIlrDfpOszg9NlokxnMN9o18CXxhF784Jnw/hR.',
