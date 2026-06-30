@@ -23,6 +23,11 @@ jobs:
       - name: 依存パッケージをインストール
         run: npm ci
 
+      - name: Prisma クライアント生成
+        run: npx prisma generate
+        env:
+          DATABASE_URL: "mysql://user:password@localhost:3306/dummy"
+
       - name: 型チェック（tsc）
         run: npx tsc --noEmit
 
