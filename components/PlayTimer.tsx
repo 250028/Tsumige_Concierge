@@ -39,16 +39,15 @@ export default function PlayTimer({ gameId, totalPlayTime, activeSessionId, acti
   const [loading, setLoading] = useState(false)
 
   // タイマーの進行管理
+  // effectボディ内での同期的setStateはカスケードレンダーを引き起こすため、
+  // setIntervalのコールバック内でsessionStartedAtから都度計算する
   useEffect(() => {
-    if (sessionStartedAt) {
-      // 既にセッションが進行中の場合は経過時間を初期化
+    if (!sessionStartedAt) return
+
+    intervalRef.current = setInterval(() => {
       setElapsed(Math.floor((Date.now() - sessionStartedAt.getTime()) / 1000))
-      intervalRef.current = setInterval(() => {
-        setElapsed(prev => prev + 1)
-      }, 1000)
-    } else {
-      setElapsed(0)
-    }
+    }, 1000)
+
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
