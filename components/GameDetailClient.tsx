@@ -30,6 +30,7 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [error, setError]               = useState('')
   const [loading, setLoading]           = useState(false)
+  const [toast, setToast]               = useState('')
 
   const [title, setTitle]               = useState(game.title)
   const [genre, setGenre]               = useState(game.genre ?? '')
@@ -50,11 +51,17 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
       body:    JSON.stringify({ title, genre, platform, status, purchaseDate, progressNote }),
     })
 
+    const data = await res.json()
     if (!res.ok) {
-      const data = await res.json()
       setError(data.message)
       setLoading(false)
       return
+    }
+
+    // クリア済みになったときにトースト通知
+    if (data.pointsAdded > 0) {
+      setToast(`🎉 クリアおめでとう！+${data.pointsAdded}pt 獲得！`)
+      setTimeout(() => setToast(''), 3000)
     }
 
     setEditing(false)
@@ -93,6 +100,13 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
 
   return (
     <div className="min-h-screen bg-white px-4 py-8">
+      {/* クリア時のトースト通知 */}
+      {toast && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-white px-6 py-3 rounded-full shadow-lg text-sm font-bold animate-bounce">
+          {toast}
+        </div>
+      )}
+
       <div className="w-full max-w-md mx-auto">
         <h1 className="text-xl font-bold text-purple-600 mb-6">
           {editing ? 'ゲーム編集' : 'ゲーム詳細'}
