@@ -43,6 +43,12 @@ export default function NewGamePage() {
   return (
     <div className="min-h-screen bg-white px-4 py-8">
       <div className="w-full max-w-md mx-auto">
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 mb-4 transition-colors"
+        >
+          ← 一つ前に戻る
+        </button>
         <h1 className="text-xl font-bold text-purple-600 mb-6">ゲーム登録</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
