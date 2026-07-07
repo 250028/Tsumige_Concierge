@@ -2,21 +2,24 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState } from 'react'
+import ChatPanel from '@/components/ChatPanel'
 
 const NAV_ITEMS = [
   { href: '/',        label: 'ホーム',       icon: '🏠' },
   { href: '/list',     label: 'リスト',       icon: '📋' },
-  { href: '/chat',     label: 'チャット',     icon: '💬' },
+  { href: '/chat',     label: 'チャット',     icon: '💬', pcDrawer: true },
   { href: '/castle',   label: '城',           icon: '🏰' },
   { href: '/profile',  label: 'プロフィール', icon: '👤' },
 ]
 
 export default function AppNav() {
   const pathname = usePathname()
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   return (
     <>
-      {/* スマホ用ボトムタブ */}
+      {/* スマホ用ボトムタブ（チャットは /chat ページへ遷移） */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 flex z-10">
         {NAV_ITEMS.map(item => {
           const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
@@ -43,6 +46,23 @@ export default function AppNav() {
         <nav className="flex flex-col p-2 gap-1">
           {NAV_ITEMS.map(item => {
             const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
+
+            // PC版チャットボタンはドロワーを開く
+            if (item.pcDrawer) {
+              return (
+                <button
+                  key={item.href}
+                  onClick={() => setDrawerOpen(true)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm w-full text-left ${
+                    drawerOpen ? 'bg-purple-50 text-purple-600 font-medium' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <span>{item.icon}</span>
+                  {item.label}
+                </button>
+              )
+            }
+
             return (
               <Link
                 key={item.href}
@@ -58,6 +78,26 @@ export default function AppNav() {
           })}
         </nav>
       </aside>
+
+      {/* PC用チャットドロワー（右からスライドイン） */}
+      <>
+        {/* オーバーレイ（ドロワー外クリックで閉じる） */}
+        {drawerOpen && (
+          <div
+            className="hidden md:block fixed inset-0 z-40"
+            onClick={() => setDrawerOpen(false)}
+          />
+        )}
+
+        {/* ドロワー本体 */}
+        <div
+          className={`hidden md:flex flex-col fixed top-0 right-0 h-screen w-[300px] bg-white border-l border-gray-200 shadow-xl z-50 transition-transform duration-300 ease-in-out ${
+            drawerOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          <ChatPanel onClose={() => setDrawerOpen(false)} />
+        </div>
+      </>
     </>
   )
 }
