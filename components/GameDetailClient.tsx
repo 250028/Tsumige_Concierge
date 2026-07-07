@@ -113,7 +113,7 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
           onClick={() => router.back()}
           className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
         >
-          ←
+          ← 一つ前に戻る
         </button>
         <h1 className="text-base font-bold text-purple-600">
           {editing ? 'ゲーム編集' : 'ゲーム詳細'}
