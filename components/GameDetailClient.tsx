@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import PlayTimer from '@/components/PlayTimer'
 
 const PLATFORMS = ['Switch', 'PS5', 'PS4', 'Xbox', 'PC', 'その他']
 const STATUSES = ['未開封', '序盤で放置', '中断中', 'プレイ中', 'クリア済み'] as const
@@ -14,18 +15,22 @@ type Game = {
   status: (typeof STATUSES)[number]
   purchaseDate: string
   progressNote: string | null
+  totalPlayTime: number
 }
 
 type Props = {
   game: Game
+  activeSessionId: number | null
+  activeSessionStartedAt: string | null
 }
 
-export default function GameDetailClient({ game }: Props) {
+export default function GameDetailClient({ game, activeSessionId, activeSessionStartedAt }: Props) {
   const router = useRouter()
   const [editing, setEditing]           = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [error, setError]               = useState('')
   const [loading, setLoading]           = useState(false)
+  const [toast, setToast]               = useState('')
 
   const [title, setTitle]               = useState(game.title)
   const [genre, setGenre]               = useState(game.genre ?? '')
@@ -46,11 +51,17 @@ export default function GameDetailClient({ game }: Props) {
       body:    JSON.stringify({ title, genre, platform, status, purchaseDate, progressNote }),
     })
 
+    const data = await res.json()
     if (!res.ok) {
-      const data = await res.json()
       setError(data.message)
       setLoading(false)
       return
+    }
+
+    // クリア済みになったときにトースト通知
+    if (data.pointsAdded > 0) {
+      setToast(`🎉 クリアおめでとう！+${data.pointsAdded}pt 獲得！`)
+      setTimeout(() => setToast(''), 3000)
     }
 
     setEditing(false)
@@ -88,11 +99,28 @@ export default function GameDetailClient({ game }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-white px-4 py-8">
-      <div className="w-full max-w-md mx-auto">
-        <h1 className="text-xl font-bold text-purple-600 mb-6">
+    <div className="min-h-screen bg-white">
+      {/* クリア時のトースト通知 */}
+      {toast && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-white px-6 py-3 rounded-full shadow-lg text-sm font-bold animate-bounce">
+          {toast}
+        </div>
+      )}
+
+      {/* ヘッダー */}
+      <header className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3">
+        <button
+          onClick={() => router.back()}
+          className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          ← 一つ前に戻る
+        </button>
+        <h1 className="text-base font-bold text-purple-600">
           {editing ? 'ゲーム編集' : 'ゲーム詳細'}
         </h1>
+      </header>
+
+      <div className="w-full max-w-md mx-auto px-4 py-6">
 
         {editing ? (
           <form onSubmit={handleSave} className="space-y-4">
@@ -210,6 +238,14 @@ export default function GameDetailClient({ game }: Props) {
               <p className="text-sm text-gray-500">進捗メモ</p>
               <p className="text-gray-900 whitespace-pre-wrap">{game.progressNote || '未設定'}</p>
             </div>
+
+            {/* プレイタイマー */}
+            <PlayTimer
+              gameId={game.id}
+              totalPlayTime={game.totalPlayTime}
+              activeSessionId={activeSessionId}
+              activeSessionStartedAt={activeSessionStartedAt}
+            />
 
             {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 

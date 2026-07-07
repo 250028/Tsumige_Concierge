@@ -67,20 +67,33 @@ export async function PUT(req: NextRequest, { params }: Params) {
     const nextStatus: GameStatus = status ?? result.game.status
     const clearedAt = nextStatus === GameStatus.クリア済み ? new Date() : null
 
-    const updated = await prisma.game.update({
-      where: { id: Number(id) },
-      data: {
-        title: title.trim(),
-        genre: genre || null,
-        platform: platform || null,
-        status: nextStatus,
-        purchaseDate: purchaseDate ? new Date(purchaseDate) : null,
-        progressNote: progressNote || null,
-        clearedAt,
-      },
-    })
+    // 「クリア済み」に初めて変わったときだけポイントを加算（クリア済み→クリア済みは対象外）
+    const justCleared =
+      nextStatus === GameStatus.クリア済み &&
+      result.game!.status !== GameStatus.クリア済み
 
-    return NextResponse.json(updated)
+    const [updated] = await prisma.$transaction([
+      prisma.game.update({
+        where: { id: Number(id) },
+        data: {
+          title: title.trim(),
+          genre: genre || null,
+          platform: platform || null,
+          status: nextStatus,
+          purchaseDate: purchaseDate ? new Date(purchaseDate) : null,
+          progressNote: progressNote || null,
+          clearedAt,
+        },
+      }),
+      ...(justCleared
+        ? [prisma.user.update({
+            where: { id: session.userId },
+            data: { points: { increment: 100 } },
+          })]
+        : []),
+    ])
+
+    return NextResponse.json({ ...updated, pointsAdded: justCleared ? 100 : 0 })
   } catch (error) {
     console.error(error)
     return NextResponse.json({ message: 'サーバーエラーが発生しました' }, { status: 500 })
