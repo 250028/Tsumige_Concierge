@@ -1,8 +1,10 @@
 import { cookies } from 'next/headers'
 import { getIronSession } from 'iron-session'
+import { unstable_cache } from 'next/cache'
 import Link from 'next/link'
 import prisma from '@/lib/prisma'
 import { sessionOptions, SessionData } from '@/lib/session'
+import { generateRecommendReason } from '@/lib/gemini'
 
 export default async function Home() {
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
@@ -18,10 +20,33 @@ export default async function Home() {
   const cleared  = games.filter(g => g.status === 'クリア済み').length
   const clearRate = total > 0 ? Math.round((cleared / total) * 100) : 0
 
-  // 「今日の1本」：AI連携までは、積んだままの中から最後にプレイした日時が古い順で仮選出
+  // 「今日の1本」：最後にプレイした日時が古い順で選出し、AIでおすすめ理由を生成
   const heroGame = games
     .filter(g => g.status !== 'クリア済み')
     .sort((a, b) => (a.lastPlayedAt?.getTime() ?? 0) - (b.lastPlayedAt?.getTime() ?? 0))[0]
+
+  // AI生成に失敗しても画面が壊れないようにフォールバック
+  let recommendReason = 'AIによるおすすめ理由は準備中です。今は最後にプレイした日が古い1本を表示しています。'
+  if (heroGame) {
+    try {
+      // 同じゲーム・同じステータスなら1時間はAPIを呼ばずキャッシュを返す
+      const getCachedReason = unstable_cache(
+        () => generateRecommendReason({
+          title: heroGame.title,
+          genre: heroGame.genre,
+          platform: heroGame.platform,
+          status: heroGame.status,
+          lastPlayedAt: heroGame.lastPlayedAt,
+          progressNote: heroGame.progressNote,
+        }),
+        [`recommend-${heroGame.id}-${heroGame.status}`],
+        { revalidate: 3600 }
+      )
+      recommendReason = await getCachedReason()
+    } catch (e) {
+      console.error('おすすめ理由の生成に失敗:', e)
+    }
+  }
 
   const recentGames = games.slice(0, 3)
 
@@ -65,11 +90,9 @@ export default async function Home() {
             href={`/games/${heroGame.id}`}
             className="block bg-white rounded-2xl border border-purple-100 p-4 hover:border-purple-300 transition-colors"
           >
-            <p className="text-xs font-bold text-purple-600 mb-1">コンシェルジュより（準備中）</p>
+            <p className="text-xs font-bold text-purple-600 mb-1">✨ コンシェルジュより</p>
             <h2 className="text-lg font-bold text-gray-900 mb-1">{heroGame.title}</h2>
-            <p className="text-sm text-gray-400">
-              AIによるおすすめ理由は準備中です。今は最後にプレイした日が古い1本を表示しています。
-            </p>
+            <p className="text-sm text-gray-600 leading-relaxed">{recommendReason}</p>
           </Link>
         ) : (
           <div className="bg-white rounded-2xl border border-gray-200 p-4 text-center text-gray-400">
