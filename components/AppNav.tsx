@@ -41,7 +41,9 @@ export default function AppNav() {
       {/* PC用サイドバー */}
       <aside className="hidden md:flex md:flex-col md:w-[200px] md:shrink-0 border-r border-gray-200 bg-white min-h-screen">
         <div className="px-4 py-4 border-b border-gray-200">
-          <p className="font-bold text-purple-600 text-sm">積みゲー・コンシェルジュ</p>
+          <Link href="/" className="font-bold text-purple-600 text-sm hover:opacity-70 transition-opacity">
+            積みゲー・コンシェルジュ
+          </Link>
         </div>
         <nav className="flex flex-col p-2 gap-1 flex-1">
           {NAV_ITEMS.map(item => {
