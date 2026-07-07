@@ -37,6 +37,7 @@ export default function PlayTimer({ gameId, totalPlayTime, activeSessionId, acti
   const [elapsed, setElapsed] = useState(0)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const [loading, setLoading] = useState(false)
+  const [memo, setMemo] = useState('')
 
   // タイマーの進行管理
   // effectボディ内での同期的setStateはカスケードレンダーを引き起こすため、
@@ -74,7 +75,7 @@ export default function PlayTimer({ gameId, totalPlayTime, activeSessionId, acti
     }
   }
 
-  // プレイ停止
+  // プレイ停止（メモも一緒に保存）
   async function handleStop() {
     if (!sessionId) return
     setLoading(true)
@@ -82,11 +83,12 @@ export default function PlayTimer({ gameId, totalPlayTime, activeSessionId, acti
       const res = await fetch(`/api/play-session/${sessionId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ progressNote: memo || undefined }),
       })
       if (res.ok) {
         setSessionId(null)
         setSessionStartedAt(null)
+        setMemo('')
         router.refresh() // 累計プレイ時間をサーバーから再取得
       }
     } catch {
@@ -123,15 +125,24 @@ export default function PlayTimer({ gameId, totalPlayTime, activeSessionId, acti
         </div>
       )}
 
-      {/* 開始 / 停止ボタン */}
+      {/* プレイ中：メモ入力 + 停止ボタン */}
       {isRunning ? (
-        <button
-          onClick={handleStop}
-          disabled={loading}
-          className="w-full py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-colors disabled:opacity-50"
-        >
-          {loading ? '停止中…' : '⏹ プレイを停止'}
-        </button>
+        <div className="space-y-2">
+          <textarea
+            value={memo}
+            onChange={e => setMemo(e.target.value)}
+            placeholder="今日の進捗メモ（任意）"
+            rows={2}
+            className="w-full px-3 py-2 rounded-lg bg-white border border-purple-200 text-sm text-gray-800 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-purple-300"
+          />
+          <button
+            onClick={handleStop}
+            disabled={loading}
+            className="w-full py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white text-sm font-semibold transition-colors disabled:opacity-50"
+          >
+            {loading ? '停止中…' : '⏹ プレイを停止'}
+          </button>
+        </div>
       ) : (
         <button
           onClick={handleStart}

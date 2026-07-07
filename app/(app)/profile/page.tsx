@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { cookies } from 'next/headers'
 import { getIronSession } from 'iron-session'
 import prisma from '@/lib/prisma'
@@ -101,6 +102,20 @@ export default async function ProfilePage() {
               <dd className="font-medium text-amber-600">{user.points} pt</dd>
             </div>
           </dl>
+        </div>
+
+        {/* 設定リンク（スマホのみ表示・PCはサイドバーに設定あり） */}
+        <div className="md:hidden">
+          <Link
+            href="/settings"
+            className="flex items-center justify-between bg-white rounded-2xl border border-gray-200 p-5 hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-xl">⚙️</span>
+              <span className="text-sm font-medium text-gray-700">設定</span>
+            </div>
+            <span className="text-gray-400 text-sm">›</span>
+          </Link>
         </div>
       </div>
     </div>
