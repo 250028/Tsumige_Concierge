@@ -3,6 +3,7 @@ import { getIronSession } from 'iron-session'
 import Link from 'next/link'
 import prisma from '@/lib/prisma'
 import { sessionOptions, SessionData } from '@/lib/session'
+import RandomSelectButton from '@/components/RandomSelectButton'
 
 export default async function Home() {
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
@@ -76,6 +77,15 @@ export default async function Home() {
             積みゲーを登録すると、ここにおすすめが表示されます
           </div>
         )}
+      </div>
+
+      {/* おまかせセレクト */}
+      <div className="px-4 pt-6">
+        <p className="text-xs font-bold text-gray-500 tracking-wide mb-2">🎲 おまかせで選ぶ</p>
+        <div className="bg-white rounded-2xl border border-amber-100 p-4 flex items-center justify-between">
+          <p className="text-sm text-gray-500">今日何やるか迷ったら</p>
+          <RandomSelectButton />
+        </div>
       </div>
 
       {/* AIチャットストリップ */}
