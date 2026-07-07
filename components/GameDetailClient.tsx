@@ -99,7 +99,7 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
   }
 
   return (
-    <div className="min-h-screen bg-white px-4 py-8">
+    <div className="min-h-screen bg-white">
       {/* クリア時のトースト通知 */}
       {toast && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-white px-6 py-3 rounded-full shadow-lg text-sm font-bold animate-bounce">
@@ -107,16 +107,20 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
         </div>
       )}
 
-      <div className="w-full max-w-md mx-auto">
+      {/* ヘッダー */}
+      <header className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-600 mb-4 transition-colors"
+          className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
         >
-          ← 一つ前に戻る
+          ←
         </button>
-        <h1 className="text-xl font-bold text-purple-600 mb-6">
+        <h1 className="text-base font-bold text-purple-600">
           {editing ? 'ゲーム編集' : 'ゲーム詳細'}
         </h1>
+      </header>
+
+      <div className="w-full max-w-md mx-auto px-4 py-6">
 
         {editing ? (
           <form onSubmit={handleSave} className="space-y-4">
