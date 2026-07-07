@@ -78,18 +78,18 @@ export default async function Home() {
         )}
       </div>
 
-      {/* AIチャットストリップ（準備中） */}
+      {/* AIチャットストリップ */}
       <div className="px-4 pt-6">
         <p className="text-xs font-bold text-gray-500 tracking-wide mb-2">💬 コンシェルジュに話す</p>
-        <div className="bg-white rounded-2xl border border-purple-100 p-4">
-          <p className="text-sm text-gray-400 mb-3">AIチャット機能は準備中です</p>
-          <input
-            type="text"
-            disabled
-            placeholder="「スカッとしたい」「2時間ある」など…"
-            className="w-full px-4 py-2 rounded-full bg-gray-100 text-gray-400 text-sm cursor-not-allowed"
-          />
-        </div>
+        <Link
+          href="/chat"
+          className="block bg-white rounded-2xl border border-purple-100 p-4 hover:border-purple-300 transition-colors"
+        >
+          <p className="text-sm text-gray-500 mb-3">AIコンシェルジュに気分や状況を話しかけてみよう</p>
+          <div className="w-full px-4 py-2 rounded-full bg-gray-100 text-gray-400 text-sm">
+            「スカッとしたい」「2時間ある」など…
+          </div>
+        </Link>
       </div>
 
       {/* 最近の積みゲー */}

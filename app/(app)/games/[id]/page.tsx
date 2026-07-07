@@ -13,7 +13,13 @@ export default async function GameDetailPage({ params }: Props) {
   const { id } = await params
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
 
-  const game = await prisma.game.findUnique({ where: { id: Number(id) } })
+  const [game, activeSession] = await Promise.all([
+    prisma.game.findUnique({ where: { id: Number(id) } }),
+    prisma.playSession.findFirst({
+      where: { gameId: Number(id), userId: session.userId!, stoppedAt: null },
+      select: { id: true, startedAt: true },
+    }),
+  ])
 
   // 存在しない、または他人のゲームなら 404
   if (!game || game.userId !== session.userId) {
@@ -30,7 +36,10 @@ export default async function GameDetailPage({ params }: Props) {
         status: game.status,
         purchaseDate: game.purchaseDate ? game.purchaseDate.toISOString().slice(0, 10) : '',
         progressNote: game.progressNote,
+        totalPlayTime: game.totalPlayTime,
       }}
+      activeSessionId={activeSession?.id ?? null}
+      activeSessionStartedAt={activeSession?.startedAt.toISOString() ?? null}
     />
   )
 }

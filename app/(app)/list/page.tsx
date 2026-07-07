@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { GameStatus } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { sessionOptions, SessionData } from '@/lib/session'
+import RandomSelectButton from '@/components/RandomSelectButton'
 
 const STATUSES: GameStatus[] = ['未開封', '序盤で放置', '中断中', 'プレイ中', 'クリア済み']
 
@@ -42,12 +43,15 @@ export default async function GameListPage({ searchParams }: Props) {
       {/* ヘッダー */}
       <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <h1 className="text-lg font-bold text-purple-600">積みゲーリスト</h1>
-        <Link
-          href="/games/new"
-          className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition-colors"
-        >
-          ＋ 登録
-        </Link>
+        <div className="flex gap-2">
+          <RandomSelectButton />
+          <Link
+            href="/games/new"
+            className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium transition-colors"
+          >
+            ＋ 登録
+          </Link>
+        </div>
       </header>
 
       {/* フィルターチップ */}
