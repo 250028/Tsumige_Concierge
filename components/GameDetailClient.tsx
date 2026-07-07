@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import PlayTimer from '@/components/PlayTimer'
 
 const PLATFORMS = ['Switch', 'PS5', 'PS4', 'Xbox', 'PC', 'その他']
 const STATUSES = ['未開封', '序盤で放置', '中断中', 'プレイ中', 'クリア済み'] as const
@@ -14,13 +15,16 @@ type Game = {
   status: (typeof STATUSES)[number]
   purchaseDate: string
   progressNote: string | null
+  totalPlayTime: number
 }
 
 type Props = {
   game: Game
+  activeSessionId: number | null
+  activeSessionStartedAt: string | null
 }
 
-export default function GameDetailClient({ game }: Props) {
+export default function GameDetailClient({ game, activeSessionId, activeSessionStartedAt }: Props) {
   const router = useRouter()
   const [editing, setEditing]           = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
@@ -210,6 +214,14 @@ export default function GameDetailClient({ game }: Props) {
               <p className="text-sm text-gray-500">進捗メモ</p>
               <p className="text-gray-900 whitespace-pre-wrap">{game.progressNote || '未設定'}</p>
             </div>
+
+            {/* プレイタイマー */}
+            <PlayTimer
+              gameId={game.id}
+              totalPlayTime={game.totalPlayTime}
+              activeSessionId={activeSessionId}
+              activeSessionStartedAt={activeSessionStartedAt}
+            />
 
             {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
