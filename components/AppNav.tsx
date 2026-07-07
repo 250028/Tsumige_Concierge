@@ -40,7 +40,7 @@ export default function AppNav() {
         <div className="px-4 py-4 border-b border-gray-200">
           <p className="font-bold text-purple-600 text-sm">積みゲー・コンシェルジュ</p>
         </div>
-        <nav className="flex flex-col p-2 gap-1">
+        <nav className="flex flex-col p-2 gap-1 flex-1">
           {NAV_ITEMS.map(item => {
             const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
             return (
@@ -57,6 +57,18 @@ export default function AppNav() {
             )
           })}
         </nav>
+        {/* 設定リンク（サイドバー下部） */}
+        <div className="p-2 border-t border-gray-100">
+          <Link
+            href="/settings"
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+              pathname === '/settings' ? 'bg-purple-50 text-purple-600 font-medium' : 'text-gray-500 hover:bg-gray-50'
+            }`}
+          >
+            <span>⚙️</span>
+            設定
+          </Link>
+        </div>
       </aside>
     </>
   )
