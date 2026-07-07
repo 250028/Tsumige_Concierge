@@ -1,7 +1,10 @@
+import ChatPanel from '@/components/ChatPanel'
+
 export default function ChatPage() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-400">
-      AIチャット機能は準備中です
+    // スマホ用：全画面チャット（ボトムタブの高さ分を引く）
+    <div className="h-[calc(100vh-4rem)]">
+      <ChatPanel />
     </div>
   )
 }
