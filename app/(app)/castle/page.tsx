@@ -2,6 +2,7 @@ import { cookies } from 'next/headers'
 import { getIronSession } from 'iron-session'
 import prisma from '@/lib/prisma'
 import { sessionOptions, SessionData } from '@/lib/session'
+import CastleClient from '@/components/CastleClient'
 
 // 消化率に応じた城ステージの定義
 const CASTLE_STAGES = [
@@ -53,7 +54,7 @@ export default async function CastlePage() {
 
   const games = await prisma.game.findMany({
     where: { userId },
-    select: { status: true, clearedAt: true },
+    select: { id: true, title: true, platform: true, genre: true, status: true, clearedAt: true },
   })
 
   const total    = games.length
@@ -62,89 +63,40 @@ export default async function CastlePage() {
   const stacked  = total - cleared
   const clearRate = total > 0 ? Math.round((cleared / total) * 100) : 0
 
-  // 今月クリアしたゲーム数
   const now = new Date()
   const clearedThisMonth = games.filter(g => {
     if (!g.clearedAt) return false
     return g.clearedAt.getFullYear() === now.getFullYear() && g.clearedAt.getMonth() === now.getMonth()
   }).length
 
+  // 次のステージまでに必要なクリア数
   const stage = getCastleStage(clearRate)
+  const nextStage = clearRate < 80 ? [...CASTLE_STAGES]
+    .filter(s => s.minRate > clearRate)
+    .sort((a, b) => a.minRate - b.minRate)[0] : null
+  const neededToNext = nextStage ? Math.ceil((nextStage.minRate / 100) * total) - cleared : 0
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <header className="bg-white border-b border-gray-200 px-6 py-4">
         <h1 className="text-lg font-bold text-purple-600">積みゲー城</h1>
       </header>
-
-      <div className="px-4 pt-6 max-w-lg mx-auto space-y-6">
-        {/* 城メインカード */}
-        <div className={`bg-gradient-to-br ${stage.bg} rounded-2xl border ${stage.border} p-8 text-center`}>
-          <div className="text-8xl mb-4">{stage.emoji}</div>
-          <p className={`text-xl font-bold ${stage.color} mb-2`}>{stage.name}</p>
-          <p className="text-sm text-gray-600 leading-relaxed">{stage.desc}</p>
-        </div>
-
-        {/* 消化率プログレスバー */}
-        <div className="bg-white rounded-2xl border border-purple-100 p-5">
-          <div className="flex justify-between items-center mb-2">
-            <p className="text-sm font-bold text-gray-700">消化率</p>
-            <p className="text-2xl font-bold text-purple-600">{clearRate}%</p>
-          </div>
-          <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
-            <div
-              className="h-4 rounded-full bg-gradient-to-r from-purple-500 to-amber-400 transition-all duration-700"
-              style={{ width: `${clearRate}%` }}
-            />
-          </div>
-          <div className="flex justify-between mt-2 text-xs text-gray-400">
-            <span>0%（廃墟）</span>
-            <span>100%（黄金の大城）</span>
-          </div>
-
-          {/* 次のステージまでのメッセージ（一番近い次のステージを表示） */}
-          {clearRate < 80 && total > 0 && (() => {
-            // minRate が現在の消化率より大きいステージのうち、最小のものを選ぶ
-            const next = [...CASTLE_STAGES]
-              .filter(s => s.minRate > clearRate)
-              .sort((a, b) => a.minRate - b.minRate)[0]
-            if (!next) return null
-            const needed = Math.ceil((next.minRate / 100) * total) - cleared
-            return (
-              <p className="mt-3 text-xs text-center text-gray-500">
-                あと <span className="font-bold text-purple-600">{needed}本</span> クリアすると「{next.name}」に進化！
-              </p>
-            )
-          })()}
-        </div>
-
-        {/* 統計グリッド */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-            <p className="text-3xl font-bold text-gray-800">{stacked}</p>
-            <p className="text-xs text-gray-500 mt-1">積みゲー残数</p>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-            <p className="text-3xl font-bold text-amber-500">{cleared}</p>
-            <p className="text-xs text-gray-500 mt-1">総クリア数</p>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-            <p className="text-3xl font-bold text-purple-500">{playing}</p>
-            <p className="text-xs text-gray-500 mt-1">プレイ中</p>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-            <p className="text-3xl font-bold text-green-500">{clearedThisMonth}</p>
-            <p className="text-xs text-gray-500 mt-1">今月のクリア</p>
-          </div>
-        </div>
-
-        {/* ゲームが0本のとき */}
-        {total === 0 && (
-          <div className="bg-white rounded-2xl border border-gray-200 p-6 text-center text-gray-400 text-sm">
-            積みゲーを登録すると、城が育ち始めます
-          </div>
-        )}
-      </div>
+      <CastleClient
+        games={games.map(g => ({
+          ...g,
+          clearedAt: g.clearedAt?.toISOString() ?? null,
+        }))}
+        stage={stage}
+        clearRate={clearRate}
+        stacked={stacked}
+        cleared={cleared}
+        playing={playing}
+        clearedThisMonth={clearedThisMonth}
+        nextStageName={nextStage?.name ?? null}
+        neededToNext={neededToNext}
+        total={total}
+        castleStages={CASTLE_STAGES}
+      />
     </div>
   )
 }
