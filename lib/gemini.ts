@@ -47,6 +47,32 @@ ${lastPlayed}
 }
 
 /**
+ * ゲーム詳細ページ用：操作方法・始め方ガイドを生成する
+ */
+export async function generateControlGuide(game: GameInfo): Promise<string> {
+  if (IS_MOCK) {
+    return `【開発モック】${game.title} の始め方\n・まずチュートリアルを完了しましょう\n・基本操作を覚えたら最初のミッションへ\n・設定でゲームの難易度を調整できます`
+  }
+
+  const prompt = `
+あなたは積みゲー消化を応援するコンシェルジュです。
+以下のゲームについて「初めてプレイする人・久しぶりにプレイする人」向けに、
+基本的な操作方法・始め方・最初にやること を箇条書き（・）で4〜6項目にまとめてください。
+情報が不確かな場合は「情報が不確かです」と正直に伝え、確実な情報のみ記載してください。
+マークダウンは使わず、「・〇〇」の形式で出力してください。
+
+ゲームタイトル: ${game.title}
+ジャンル: ${game.genre ?? '不明'}
+プラットフォーム: ${game.platform ?? '不明'}
+ステータス: ${game.status}
+進捗メモ: ${game.progressNote ?? 'なし'}
+`
+
+  const result = await model.generateContent(prompt)
+  return result.response.text()
+}
+
+/**
  * ゲーム詳細ページ用：「ここが面白い！」モチベーターコメントを生成する
  */
 export async function generateMotivator(game: GameInfo): Promise<string> {
