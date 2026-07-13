@@ -4,39 +4,97 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import ChatPanel from '@/components/ChatPanel'
+import ListSheet from '@/components/sheets/ListSheet'
+import CastleSheet from '@/components/sheets/CastleSheet'
+import ProfileSheet from '@/components/sheets/ProfileSheet'
 
-const NAV_ITEMS = [
-  { href: '/',        label: 'ホーム',       icon: '🏠', pcDrawer: false },
-  { href: '/list',    label: 'リスト',       icon: '📋', pcDrawer: false },
-  { href: '/chat',    label: 'チャット',     icon: '💬', pcDrawer: true  },
-  { href: '/castle',  label: '城',           icon: '🏰', pcDrawer: false },
-  { href: '/profile', label: 'プロフィール', icon: '👤', pcDrawer: false },
+type SheetId = 'list' | 'chat' | 'castle' | 'profile'
+
+const NAV_ITEMS: { href: string; label: string; icon: string; sheet: SheetId | null; pcDrawer: boolean }[] = [
+  { href: '/',        label: 'ホーム',       icon: '🏠', sheet: null,      pcDrawer: false },
+  { href: '/list',    label: 'リスト',       icon: '📋', sheet: 'list',    pcDrawer: false },
+  { href: '/chat',    label: 'チャット',     icon: '💬', sheet: 'chat',    pcDrawer: true  },
+  { href: '/castle',  label: '城',           icon: '🏰', sheet: 'castle',  pcDrawer: false },
+  { href: '/profile', label: 'プロフィール', icon: '👤', sheet: 'profile', pcDrawer: false },
 ]
 
 export default function AppNav() {
   const pathname = usePathname()
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [activeSheet, setActiveSheet] = useState<SheetId | null>(null)
+
+  function toggleSheet(sheet: SheetId) {
+    setActiveSheet(prev => prev === sheet ? null : sheet)
+  }
 
   return (
     <>
-      {/* スマホ用ボトムタブ（チャットは /chat ページへ遷移） */}
+      {/* スマホ用ボトムタブ */}
       <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 flex z-10">
         {NAV_ITEMS.map(item => {
-          const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)
+          const active = activeSheet === item.sheet && item.sheet !== null
+            || (item.sheet === null && (item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)))
+
+          // ホームだけページ遷移
+          if (item.sheet === null) {
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setActiveSheet(null)}
+                className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-xs ${
+                  active ? 'text-purple-600' : 'text-gray-400'
+                }`}
+              >
+                <span className="text-lg">{item.icon}</span>
+                {item.label}
+              </Link>
+            )
+          }
+
+          // その他はボトムシートを開く
           return (
-            <Link
+            <button
               key={item.href}
-              href={item.href}
+              onClick={() => toggleSheet(item.sheet!)}
               className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-xs ${
                 active ? 'text-purple-600' : 'text-gray-400'
               }`}
             >
               <span className="text-lg">{item.icon}</span>
               {item.label}
-            </Link>
+            </button>
           )
         })}
       </nav>
+
+      {/* ボトムシート：オーバーレイ */}
+      {activeSheet && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/40 z-20"
+          onClick={() => setActiveSheet(null)}
+        />
+      )}
+
+      {/* ボトムシート：パネル本体 */}
+      <div
+        className={`md:hidden fixed bottom-0 inset-x-0 bg-white rounded-t-2xl z-30 flex flex-col transition-transform duration-300 ease-in-out ${
+          activeSheet ? 'translate-y-0 pointer-events-auto' : 'translate-y-full pointer-events-none'
+        }`}
+        style={{ height: '75vh', paddingBottom: '4rem' /* ボトムタブ分の余白 */ }}
+      >
+        {/* ドラッグハンドル */}
+        <div className="flex justify-center pt-3 pb-1 shrink-0">
+          <div className="w-10 h-1 rounded-full bg-gray-300" />
+        </div>
+        {/* 各シートのコンテンツ */}
+        <div className="flex-1 overflow-hidden">
+          {activeSheet === 'chat'    && <ChatPanel onClose={() => setActiveSheet(null)} />}
+          {activeSheet === 'list'    && <ListSheet onClose={() => setActiveSheet(null)} />}
+          {activeSheet === 'castle'  && <CastleSheet onClose={() => setActiveSheet(null)} />}
+          {activeSheet === 'profile' && <ProfileSheet onClose={() => setActiveSheet(null)} />}
+        </div>
+      </div>
 
       {/* PC用サイドバー */}
       <aside className="hidden md:flex md:flex-col md:w-[200px] md:shrink-0 border-r border-gray-200 bg-white min-h-screen">
