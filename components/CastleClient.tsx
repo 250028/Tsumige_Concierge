@@ -127,6 +127,36 @@ export default function CastleClient({
         ))}
       </div>
 
+      {/* ステージロードマップ（4段階を横並びで表示） */}
+      <div className="bg-white rounded-2xl border border-purple-100 p-5">
+        <p className="text-sm font-bold text-gray-700 mb-4">城の成長段階</p>
+        <div className="flex items-center justify-between gap-1">
+          {[...castleStages].reverse().map((s, i, arr) => {
+            const isCurrent = s.name === stage.name
+            const isPast    = stage.minRate > s.minRate
+            return (
+              <div key={s.name} className="flex items-center flex-1 min-w-0">
+                <div className="flex flex-col items-center flex-1 min-w-0">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all
+                    ${isCurrent ? 'ring-4 ring-purple-400 bg-purple-50 scale-110' : isPast ? 'bg-amber-50' : 'bg-gray-100 opacity-40'}`}>
+                    {s.emoji}
+                  </div>
+                  <p className={`text-xs mt-1 text-center leading-tight truncate w-full
+                    ${isCurrent ? 'text-purple-600 font-bold' : isPast ? 'text-amber-600' : 'text-gray-400'}`}>
+                    {s.name}
+                  </p>
+                  <p className="text-xs text-gray-300">{s.minRate}%〜</p>
+                </div>
+                {i < arr.length - 1 && (
+                  <div className={`h-0.5 w-4 shrink-0 mx-1 rounded-full
+                    ${isPast ? 'bg-amber-400' : 'bg-gray-200'}`} />
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
       {total === 0 && (
         <div className="bg-white rounded-2xl border border-gray-200 p-6 text-center text-gray-400 text-sm">
           積みゲーを登録すると、城が育ち始めます

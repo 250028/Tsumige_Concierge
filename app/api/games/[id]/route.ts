@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { GameStatus } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { sessionOptions, SessionData } from '@/lib/session'
+import { checkAndGrantAchievements } from '@/lib/achievements'
 
 function isValidStatus(value: unknown): value is GameStatus {
   return typeof value === 'string' && Object.values(GameStatus).includes(value as GameStatus)
@@ -93,7 +94,12 @@ export async function PUT(req: NextRequest, { params }: Params) {
         : []),
     ])
 
-    return NextResponse.json({ ...updated, pointsAdded: justCleared ? 100 : 0 })
+    // クリア時に実績チェック（新規解除分の実績名を返す）
+    const newAchievements = justCleared
+      ? await checkAndGrantAchievements(session.userId)
+      : []
+
+    return NextResponse.json({ ...updated, pointsAdded: justCleared ? 100 : 0, newAchievements })
   } catch (error) {
     console.error(error)
     return NextResponse.json({ message: 'サーバーエラーが発生しました' }, { status: 500 })
