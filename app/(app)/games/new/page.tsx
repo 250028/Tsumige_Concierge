@@ -25,6 +25,29 @@ export default function NewGamePage() {
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null)
   const [rawgId, setRawgId]               = useState<number | null>(null)
 
+  // 手動アップロード用state
+  const [uploading, setUploading] = useState(false)
+
+  async function handleCoverUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    try {
+      const form = new FormData()
+      form.append('cover', file)
+      const res = await fetch('/api/uploads/cover', { method: 'POST', body: form })
+      const data = await res.json()
+      if (data.coverImageUrl) {
+        setCoverImageUrl(data.coverImageUrl)
+        setRawgId(null)
+      }
+    } catch {
+      setError('画像のアップロードに失敗しました')
+    } finally {
+      setUploading(false)
+    }
+  }
+
   // RAWGでタイトル検索
   async function handleSearch() {
     if (!title.trim()) return
@@ -165,9 +188,23 @@ export default function NewGamePage() {
                   height={36}
                   className="rounded object-cover"
                 />
-                <span>✅ RAWGから情報を取得しました</span>
+                <span>✅ カバー画像が設定されました</span>
               </div>
             )}
+
+            {/* 手動アップロード */}
+            <div className="mt-2">
+              <label className="inline-flex items-center gap-1 text-xs text-gray-500 cursor-pointer hover:text-purple-600 transition-colors">
+                <span>{uploading ? 'アップロード中…' : '📁 画像を自分でアップロード'}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={uploading}
+                  onChange={handleCoverUpload}
+                />
+              </label>
+            </div>
           </div>
 
           {/* ジャンル */}

@@ -37,6 +37,7 @@ export default async function GameDetailPage({ params }: Props) {
         purchaseDate: game.purchaseDate ? game.purchaseDate.toISOString().slice(0, 10) : '',
         progressNote: game.progressNote,
         totalPlayTime: game.totalPlayTime,
+        coverImageUrl: game.coverImageUrl,
       }}
       activeSessionId={activeSession?.id ?? null}
       activeSessionStartedAt={activeSession?.startedAt.toISOString() ?? null}

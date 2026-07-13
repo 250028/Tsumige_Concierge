@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
 import { getIronSession } from 'iron-session'
 import Link from 'next/link'
+import Image from 'next/image'
 import { GameStatus } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { sessionOptions, SessionData } from '@/lib/session'
@@ -94,9 +95,18 @@ export default async function GameListPage({ searchParams }: Props) {
                   href={`/games/${game.id}`}
                   className="flex items-center gap-3 bg-white rounded-lg border border-gray-200 p-3 hover:border-purple-300 transition-colors"
                 >
-                  {/* カバー画像の代わりに頭文字アイコン */}
-                  <div className="w-12 h-12 shrink-0 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center font-bold">
-                    {game.title.charAt(0)}
+                  {/* カバー画像（なければ頭文字アイコン） */}
+                  <div className="relative w-16 h-12 shrink-0 rounded-lg overflow-hidden bg-purple-100 flex items-center justify-center">
+                    {game.coverImageUrl ? (
+                      <Image
+                        src={game.coverImageUrl}
+                        alt={game.title}
+                        fill
+                        className="object-cover"
+                      />
+                    ) : (
+                      <span className="text-purple-600 font-bold">{game.title.charAt(0)}</span>
+                    )}
                   </div>
 
                   <div className="min-w-0 flex-1">
