@@ -5,11 +5,23 @@ import prisma from '@/lib/prisma'
 import { sessionOptions, SessionData } from '@/lib/session'
 import ProfileForm from '@/components/ProfileForm'
 
+// ポイント数に応じたランク定義
+const RANKS = [
+  { minPoints: 500, label: 'レジェンドゲーマー', color: 'text-amber-600',  bg: 'bg-amber-50',  border: 'border-amber-200',  icon: '👑' },
+  { minPoints: 200, label: '積みゲーハンター',   color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200', icon: '🏆' },
+  { minPoints:  50, label: 'ゲーム消化人',       color: 'text-blue-600',   bg: 'bg-blue-50',   border: 'border-blue-200',   icon: '🎮' },
+  { minPoints:   0, label: '積みゲー見習い',     color: 'text-gray-600',   bg: 'bg-gray-50',   border: 'border-gray-200',   icon: '📦' },
+]
+
+function getRank(points: number) {
+  return RANKS.find(r => points >= r.minPoints)!
+}
+
 export default async function ProfilePage() {
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
   const userId = session.userId!
 
-  const [user, games] = await Promise.all([
+  const [user, games, allAchievements, userAchievements] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -26,6 +38,11 @@ export default async function ProfilePage() {
       where: { userId },
       select: { status: true },
     }),
+    prisma.achievement.findMany({ orderBy: { id: 'asc' } }),
+    prisma.userAchievement.findMany({
+      where: { userId },
+      select: { achievementId: true, achievedAt: true },
+    }),
   ])
 
   if (!user) return null
@@ -37,6 +54,9 @@ export default async function ProfilePage() {
   const gamingYears = user.gamingSince
     ? new Date().getFullYear() - user.gamingSince + 1
     : null
+
+  const rank = getRank(user.points)
+  const earnedIds = new Map(userAchievements.map(ua => [ua.achievementId, ua.achievedAt]))
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
@@ -81,6 +101,57 @@ export default async function ProfilePage() {
               ゲーマー歴 {gamingYears} 年のベテラン
             </p>
           )}
+        </div>
+
+        {/* ランクカード */}
+        <div className={`${rank.bg} rounded-2xl border ${rank.border} p-5 flex items-center gap-4`}>
+          <div className="text-4xl">{rank.icon}</div>
+          <div>
+            <p className="text-xs text-gray-500 mb-0.5">現在のランク</p>
+            <p className={`text-lg font-bold ${rank.color}`}>{rank.label}</p>
+            <p className="text-xs text-gray-400 mt-0.5">累計 {user.points} pt</p>
+          </div>
+          <div className="ml-auto text-right">
+            {RANKS.find(r => r.minPoints > user.points) && (
+              <>
+                <p className="text-xs text-gray-400">次のランクまで</p>
+                <p className={`text-sm font-bold ${rank.color}`}>
+                  {(RANKS.find(r => r.minPoints > user.points)!.minPoints - user.points)} pt
+                </p>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* 実績バッジ */}
+        <div className="bg-white rounded-2xl border border-purple-100 p-6">
+          <p className="text-sm font-bold text-gray-700 mb-4">実績</p>
+          <div className="grid grid-cols-3 gap-3">
+            {allAchievements.map(achievement => {
+              const earnedAt = earnedIds.get(achievement.id)
+              const isEarned = !!earnedAt
+              return (
+                <div
+                  key={achievement.id}
+                  className={`flex flex-col items-center text-center p-3 rounded-xl border transition-colors
+                    ${isEarned
+                      ? 'bg-amber-50 border-amber-200'
+                      : 'bg-gray-50 border-gray-200 opacity-50'
+                    }`}
+                >
+                  <span className="text-2xl mb-1">{isEarned ? achievement.icon : '🔒'}</span>
+                  <p className={`text-xs font-bold leading-tight ${isEarned ? 'text-amber-700' : 'text-gray-500'}`}>
+                    {isEarned ? achievement.name : '???'}
+                  </p>
+                  {isEarned && earnedAt && (
+                    <p className="text-xs text-gray-400 mt-1">
+                      {new Date(earnedAt).toLocaleDateString('ja-JP')}
+                    </p>
+                  )}
+                </div>
+              )
+            })}
+          </div>
         </div>
 
         {/* アカウント情報（読み取り専用） */}

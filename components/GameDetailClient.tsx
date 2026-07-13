@@ -55,6 +55,23 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
     }
   }
 
+  // AIあらすじの状態
+  const [synopsis, setSynopsis]               = useState<string | null>(null)
+  const [synopsisLoading, setSynopsisLoading] = useState(false)
+
+  async function handleFetchSynopsis() {
+    setSynopsisLoading(true)
+    try {
+      const res = await fetch(`/api/games/${game.id}/synopsis`)
+      const data = await res.json()
+      if (data.synopsis) setSynopsis(data.synopsis)
+    } catch {
+      setSynopsis('あらすじの取得に失敗しました。もう一度お試しください。')
+    } finally {
+      setSynopsisLoading(false)
+    }
+  }
+
   // AIモチベーターの状態
   const [motivator, setMotivator]       = useState<string | null>(null)
   const [motivatorLoading, setMotivatorLoading] = useState(false)
@@ -115,10 +132,14 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
       return
     }
 
-    // クリア済みになったときにトースト通知
+    // クリア済みになったときにトースト通知（実績も表示）
     if (data.pointsAdded > 0) {
-      setToast(`🎉 クリアおめでとう！+${data.pointsAdded}pt 獲得！`)
-      setTimeout(() => setToast(''), 3000)
+      const achievements: string[] = data.newAchievements ?? []
+      const achievementText = achievements.length > 0
+        ? `　実績解除：${achievements.join('・')}`
+        : ''
+      setToast(`🎉 クリアおめでとう！+${data.pointsAdded}pt 獲得！${achievementText}`)
+      setTimeout(() => setToast(''), 5000)
     }
 
     setEditing(false)
@@ -319,6 +340,33 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
             <div>
               <p className="text-sm text-gray-500">進捗メモ</p>
               <p className="text-gray-900 whitespace-pre-wrap">{game.progressNote || '未設定'}</p>
+            </div>
+
+            {/* AIあらすじ */}
+            <div className="bg-green-50 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-bold text-green-600">📖 どんなゲーム？</p>
+                {synopsis && (
+                  <button
+                    onClick={handleFetchSynopsis}
+                    disabled={synopsisLoading}
+                    className="text-xs text-gray-400 hover:text-green-500 disabled:opacity-40 transition-colors"
+                  >
+                    {synopsisLoading ? '生成中…' : '🔄 再生成'}
+                  </button>
+                )}
+              </div>
+              {synopsis ? (
+                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{synopsis}</p>
+              ) : (
+                <button
+                  onClick={handleFetchSynopsis}
+                  disabled={synopsisLoading}
+                  className="w-full py-2 rounded-lg border border-green-200 text-sm text-green-600 font-medium hover:bg-green-100 disabled:opacity-40 transition-colors"
+                >
+                  {synopsisLoading ? '生成中…' : 'どんなゲームかAIに聞く'}
+                </button>
+              )}
             </div>
 
             {/* AIモチベーター */}

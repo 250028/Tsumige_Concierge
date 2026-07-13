@@ -98,6 +98,33 @@ export async function generateMotivator(game: GameInfo): Promise<string> {
 }
 
 /**
+ * ゲーム詳細ページ用：「どんなゲーム？」あらすじ要約を生成する
+ */
+export async function generateSynopsis(game: GameInfo): Promise<string> {
+  if (IS_MOCK) {
+    return `【開発モック】${game.title} は世界観豊かなゲームです。プレイヤーは主人公となり、様々な謎を解きながら冒険を進めていきます。`
+  }
+
+  const prompt = `
+あなたは積みゲー消化を応援するコンシェルジュです。
+以下のゲームについて「どんなゲームか」を積みゲーユーザー向けに分かりやすく、
+3〜4文で要約してください。
+ジャンル・世界観・主な遊び方・楽しみどころを盛り込んでください。
+情報が不確かな場合は「情報が不確かです」と正直に伝え、確実な情報のみ記載してください。
+マークダウンは使わず、普通の文章で出力してください。
+
+ゲームタイトル: ${game.title}
+ジャンル: ${game.genre ?? '不明'}
+プラットフォーム: ${game.platform ?? '不明'}
+ステータス: ${game.status}
+進捗メモ: ${game.progressNote ?? 'なし'}
+`
+
+  const result = await model.generateContent(prompt)
+  return result.response.text()
+}
+
+/**
  * ユーザーのメッセージと積みゲーリストを受け取り、チャット返答を生成する
  * ペルソナ: butler（執事）/ gamer（ゲーマー仲間）/ fairy（ゲームの妖精）
  */
