@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import PlayTimer from '@/components/PlayTimer'
 
 const PLATFORMS = ['Switch', 'PS5', 'PS4', 'Xbox', 'PC', 'その他']
@@ -16,6 +17,7 @@ type Game = {
   purchaseDate: string
   progressNote: string | null
   totalPlayTime: number
+  coverImageUrl: string | null
 }
 
 type Props = {
@@ -31,6 +33,27 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
   const [error, setError]               = useState('')
   const [loading, setLoading]           = useState(false)
   const [toast, setToast]               = useState('')
+
+  // カバー画像の状態（アップロードで即時更新）
+  const [coverImageUrl, setCoverImageUrl] = useState(game.coverImageUrl)
+  const [coverUploading, setCoverUploading] = useState(false)
+
+  async function handleCoverUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setCoverUploading(true)
+    try {
+      const form = new FormData()
+      form.append('cover', file)
+      const res = await fetch(`/api/games/${game.id}/cover`, { method: 'POST', body: form })
+      const data = await res.json()
+      if (data.coverImageUrl) setCoverImageUrl(data.coverImageUrl)
+    } catch {
+      setError('画像のアップロードに失敗しました')
+    } finally {
+      setCoverUploading(false)
+    }
+  }
 
   // AIモチベーターの状態
   const [motivator, setMotivator]       = useState<string | null>(null)
@@ -248,6 +271,31 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
           </form>
         ) : (
           <div className="space-y-4">
+            {/* カバー画像 */}
+            <div className="relative w-full h-40 rounded-xl overflow-hidden bg-purple-100 flex items-center justify-center">
+              {coverImageUrl ? (
+                <Image
+                  src={coverImageUrl}
+                  alt={game.title}
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <span className="text-5xl text-purple-300">{game.title.charAt(0)}</span>
+              )}
+              {/* 画像変更ボタン（右下に重ねる） */}
+              <label className="absolute bottom-2 right-2 px-2 py-1 bg-black/50 text-white text-xs rounded-lg cursor-pointer hover:bg-black/70 transition-colors">
+                {coverUploading ? 'アップロード中…' : '📁 画像を変更'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={coverUploading}
+                  onChange={handleCoverUpload}
+                />
+              </label>
+            </div>
+
             <div>
               <p className="text-sm text-gray-500">タイトル</p>
               <p className="text-gray-900 font-medium">{game.title}</p>
