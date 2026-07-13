@@ -47,6 +47,31 @@ ${lastPlayed}
 }
 
 /**
+ * ゲーム詳細ページ用：「ここが面白い！」モチベーターコメントを生成する
+ */
+export async function generateMotivator(game: GameInfo): Promise<string> {
+  if (IS_MOCK) {
+    return `【開発モック】${game.title} は独特の世界観が魅力です。まずは最初の1時間だけ試してみてください！`
+  }
+
+  const prompt = `
+あなたは積みゲー消化を応援する優しいコンシェルジュです。
+以下のゲームについて「ここが面白い！やる気が出る！」という視点で、
+プレイヤーのモチベーションが上がるよう親しみやすい日本語で2〜3文で書いてください。
+情報が不確かな場合は推測せず、分かる情報だけで自然にまとめてください。
+
+ゲームタイトル: ${game.title}
+ジャンル: ${game.genre ?? '不明'}
+プラットフォーム: ${game.platform ?? '不明'}
+ステータス: ${game.status}
+進捗メモ: ${game.progressNote ?? 'なし'}
+`
+
+  const result = await model.generateContent(prompt)
+  return result.response.text()
+}
+
+/**
  * ユーザーのメッセージと積みゲーリストを受け取り、チャット返答を生成する
  * ペルソナ: butler（執事）/ gamer（ゲーマー仲間）/ fairy（ゲームの妖精）
  */

@@ -6,6 +6,7 @@ import prisma from '@/lib/prisma'
 import { sessionOptions, SessionData } from '@/lib/session'
 import { generateRecommendReason } from '@/lib/gemini'
 import RandomSelectButton from '@/components/RandomSelectButton'
+import RecommendCard from '@/components/RecommendCard'
 
 export default async function Home() {
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
@@ -83,18 +84,15 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* 今日の1本（AI連携までは仮のおすすめ表示） */}
+      {/* 今日の1本 */}
       <div className="px-4 pt-6">
         <p className="text-xs font-bold text-gray-500 tracking-wide mb-2">🎯 今日の1本</p>
         {heroGame ? (
-          <Link
-            href={`/games/${heroGame.id}`}
-            className="block bg-white rounded-2xl border border-purple-100 p-4 hover:border-purple-300 transition-colors"
-          >
-            <p className="text-xs font-bold text-purple-600 mb-1">✨ コンシェルジュより</p>
-            <h2 className="text-lg font-bold text-gray-900 mb-1">{heroGame.title}</h2>
-            <p className="text-sm text-gray-600 leading-relaxed">{recommendReason}</p>
-          </Link>
+          <RecommendCard
+            gameId={heroGame.id}
+            gameTitle={heroGame.title}
+            initialReason={recommendReason}
+          />
         ) : (
           <div className="bg-white rounded-2xl border border-gray-200 p-4 text-center text-gray-400">
             積みゲーを登録すると、ここにおすすめが表示されます
