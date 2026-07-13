@@ -300,6 +300,7 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
                   alt={game.title}
                   fill
                   className="object-cover"
+                  unoptimized={coverImageUrl.startsWith('/')}
                 />
               ) : (
                 <span className="text-5xl text-purple-300">{game.title.charAt(0)}</span>

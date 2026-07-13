@@ -103,6 +103,7 @@ export default async function GameListPage({ searchParams }: Props) {
                         alt={game.title}
                         fill
                         className="object-cover"
+                        unoptimized={game.coverImageUrl.startsWith('/')}
                       />
                     ) : (
                       <span className="text-purple-600 font-bold">{game.title.charAt(0)}</span>

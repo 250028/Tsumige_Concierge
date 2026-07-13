@@ -2,6 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    // アップロード画像など動的なローカルパスを許可（Next.js 15のセキュリティ要件）
+    localPatterns: [
+      { pathname: '/uploads/**' },
+    ],
     remotePatterns: [
       {
         // RAWGのゲームカバー画像
