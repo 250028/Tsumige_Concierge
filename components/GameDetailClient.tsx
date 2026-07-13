@@ -36,6 +36,23 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
   const [motivator, setMotivator]       = useState<string | null>(null)
   const [motivatorLoading, setMotivatorLoading] = useState(false)
 
+  // AI操作ガイドの状態
+  const [controlGuide, setControlGuide]         = useState<string | null>(null)
+  const [controlGuideLoading, setControlGuideLoading] = useState(false)
+
+  async function handleFetchControlGuide() {
+    setControlGuideLoading(true)
+    try {
+      const res = await fetch(`/api/games/${game.id}/control-guide`)
+      const data = await res.json()
+      if (data.guide) setControlGuide(data.guide)
+    } catch {
+      setControlGuide('操作ガイドの取得に失敗しました。もう一度お試しください。')
+    } finally {
+      setControlGuideLoading(false)
+    }
+  }
+
   async function handleFetchMotivator() {
     setMotivatorLoading(true)
     try {
@@ -279,6 +296,33 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
                   className="w-full py-2 rounded-lg border border-purple-200 text-sm text-purple-600 font-medium hover:bg-purple-100 disabled:opacity-40 transition-colors"
                 >
                   {motivatorLoading ? '生成中…' : '「ここが面白い！」をAIに聞く'}
+                </button>
+              )}
+            </div>
+
+            {/* AI操作ガイド */}
+            <div className="bg-blue-50 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-bold text-blue-600">🎮 始め方・操作ガイド</p>
+                {controlGuide && (
+                  <button
+                    onClick={handleFetchControlGuide}
+                    disabled={controlGuideLoading}
+                    className="text-xs text-gray-400 hover:text-blue-500 disabled:opacity-40 transition-colors"
+                  >
+                    {controlGuideLoading ? '生成中…' : '🔄 再生成'}
+                  </button>
+                )}
+              </div>
+              {controlGuide ? (
+                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{controlGuide}</p>
+              ) : (
+                <button
+                  onClick={handleFetchControlGuide}
+                  disabled={controlGuideLoading}
+                  className="w-full py-2 rounded-lg border border-blue-200 text-sm text-blue-600 font-medium hover:bg-blue-100 disabled:opacity-40 transition-colors"
+                >
+                  {controlGuideLoading ? '生成中…' : '始め方・操作方法をAIに聞く'}
                 </button>
               )}
             </div>
