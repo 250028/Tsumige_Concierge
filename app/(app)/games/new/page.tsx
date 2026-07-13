@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import type { RawgGame } from '@/lib/rawg'
 
 const PLATFORMS = ['Switch', 'PS5', 'PS4', 'Xbox', 'PC', 'その他']
 const STATUSES = ['未開封', '序盤で放置', '中断中', 'プレイ中', 'クリア済み'] as const
@@ -9,13 +11,44 @@ const STATUSES = ['未開封', '序盤で放置', '中断中', 'プレイ中', '
 export default function NewGamePage() {
   const router = useRouter()
   const [title, setTitle]               = useState('')
-  const [genre, setGenre]                 = useState('')
-  const [platform, setPlatform]           = useState(PLATFORMS[0])
-  const [status, setStatus]               = useState<(typeof STATUSES)[number]>('未開封')
-  const [purchaseDate, setPurchaseDate]   = useState('')
-  const [progressNote, setProgressNote]   = useState('')
-  const [error, setError]                 = useState('')
-  const [loading, setLoading]             = useState(false)
+  const [genre, setGenre]               = useState('')
+  const [platform, setPlatform]         = useState(PLATFORMS[0])
+  const [status, setStatus]             = useState<(typeof STATUSES)[number]>('未開封')
+  const [purchaseDate, setPurchaseDate] = useState('')
+  const [progressNote, setProgressNote] = useState('')
+  const [error, setError]               = useState('')
+  const [loading, setLoading]           = useState(false)
+
+  // RAWG検索用state
+  const [searchResults, setSearchResults] = useState<RawgGame[]>([])
+  const [searching, setSearching]         = useState(false)
+  const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null)
+  const [rawgId, setRawgId]               = useState<number | null>(null)
+
+  // RAWGでタイトル検索
+  async function handleSearch() {
+    if (!title.trim()) return
+    setSearching(true)
+    setSearchResults([])
+    try {
+      const res = await fetch(`/api/rawg/search?q=${encodeURIComponent(title)}`)
+      const data = await res.json()
+      setSearchResults(data.games ?? [])
+    } catch {
+      setError('ゲームの検索に失敗しました')
+    } finally {
+      setSearching(false)
+    }
+  }
+
+  // 候補を選択したらフォームに自動入力
+  function handleSelectGame(game: RawgGame) {
+    setTitle(game.title)
+    setGenre(game.genre ?? '')
+    setCoverImageUrl(game.coverImageUrl)
+    setRawgId(game.rawgId)
+    setSearchResults([])
+  }
 
   // 登録処理
   async function handleSubmit(e: React.FormEvent) {
@@ -26,7 +59,7 @@ export default function NewGamePage() {
     const res = await fetch('/api/games', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ title, genre, platform, status, purchaseDate, progressNote }),
+      body:    JSON.stringify({ title, genre, platform, status, purchaseDate, progressNote, coverImageUrl, rawgId }),
     })
 
     if (!res.ok) {
@@ -54,21 +87,87 @@ export default function NewGamePage() {
       </header>
 
       <div className="w-full max-w-md mx-auto px-4 py-6">
-
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* タイトル（必須） */}
+
+          {/* タイトル + RAWGで検索 */}
           <div>
             <label className="block text-sm text-gray-700 mb-1">
               タイトル <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              placeholder="ゼルダの伝説"
-              required
-              className="w-full px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:border-purple-500"
-            />
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={title}
+                onChange={e => { setTitle(e.target.value); setSearchResults([]); setCoverImageUrl(null); setRawgId(null) }}
+                placeholder="ゼルダの伝説"
+                required
+                className="flex-1 px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:border-purple-500"
+              />
+              <button
+                type="button"
+                onClick={handleSearch}
+                disabled={searching || !title.trim()}
+                className="px-3 py-2 rounded-lg bg-purple-100 text-purple-600 text-sm font-medium hover:bg-purple-200 disabled:opacity-40 transition-colors shrink-0"
+              >
+                {searching ? '検索中…' : '🔍 検索'}
+              </button>
+            </div>
+
+            {/* 検索結果ドロップダウン */}
+            {searchResults.length > 0 && (
+              <ul className="mt-1 border border-gray-200 rounded-lg overflow-hidden shadow-md">
+                {searchResults.map(game => (
+                  <li key={game.rawgId}>
+                    <button
+                      type="button"
+                      onClick={() => handleSelectGame(game)}
+                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-purple-50 transition-colors text-left"
+                    >
+                      {game.coverImageUrl ? (
+                        <Image
+                          src={game.coverImageUrl}
+                          alt={game.title}
+                          width={48}
+                          height={28}
+                          className="rounded object-cover shrink-0"
+                        />
+                      ) : (
+                        <div className="w-12 h-7 rounded bg-gray-200 shrink-0" />
+                      )}
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-900 truncate">{game.title}</p>
+                        {game.genre && (
+                          <p className="text-xs text-gray-500">{game.genre}</p>
+                        )}
+                      </div>
+                    </button>
+                  </li>
+                ))}
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => setSearchResults([])}
+                    className="w-full px-3 py-2 text-xs text-gray-400 hover:bg-gray-50 transition-colors text-center"
+                  >
+                    候補を閉じる
+                  </button>
+                </li>
+              </ul>
+            )}
+
+            {/* 選択済みカバー画像プレビュー */}
+            {coverImageUrl && searchResults.length === 0 && (
+              <div className="mt-2 flex items-center gap-2 text-xs text-purple-600">
+                <Image
+                  src={coverImageUrl}
+                  alt="カバー画像"
+                  width={64}
+                  height={36}
+                  className="rounded object-cover"
+                />
+                <span>✅ RAWGから情報を取得しました</span>
+              </div>
+            )}
           </div>
 
           {/* ジャンル */}
