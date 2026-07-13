@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'ログインしてください' }, { status: 401 })
     }
 
-    const { title, genre, platform, status, purchaseDate, progressNote } = await req.json()
+    const { title, genre, platform, status, purchaseDate, progressNote, coverImageUrl, rawgId } = await req.json()
 
     // タイトルは必須
     if (!title || typeof title !== 'string' || title.trim() === '') {
@@ -65,6 +65,8 @@ export async function POST(req: NextRequest) {
         status: status ?? GameStatus.未開封,
         purchaseDate: purchaseDate ? new Date(purchaseDate) : null,
         progressNote: progressNote || null,
+        coverImageUrl: coverImageUrl || null,
+        rawgId: rawgId ? Number(rawgId) : null,
       },
     })
 
