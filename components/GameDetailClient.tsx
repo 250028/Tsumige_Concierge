@@ -32,6 +32,23 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
   const [loading, setLoading]           = useState(false)
   const [toast, setToast]               = useState('')
 
+  // AIモチベーターの状態
+  const [motivator, setMotivator]       = useState<string | null>(null)
+  const [motivatorLoading, setMotivatorLoading] = useState(false)
+
+  async function handleFetchMotivator() {
+    setMotivatorLoading(true)
+    try {
+      const res = await fetch(`/api/games/${game.id}/motivator`)
+      const data = await res.json()
+      if (data.motivator) setMotivator(data.motivator)
+    } catch {
+      setMotivator('AIコメントの取得に失敗しました。もう一度お試しください。')
+    } finally {
+      setMotivatorLoading(false)
+    }
+  }
+
   const [title, setTitle]               = useState(game.title)
   const [genre, setGenre]               = useState(game.genre ?? '')
   const [platform, setPlatform]         = useState(game.platform ?? PLATFORMS[0])
@@ -237,6 +254,33 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
             <div>
               <p className="text-sm text-gray-500">進捗メモ</p>
               <p className="text-gray-900 whitespace-pre-wrap">{game.progressNote || '未設定'}</p>
+            </div>
+
+            {/* AIモチベーター */}
+            <div className="bg-purple-50 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-bold text-purple-600">✨ AIコンシェルジュより</p>
+                {motivator && (
+                  <button
+                    onClick={handleFetchMotivator}
+                    disabled={motivatorLoading}
+                    className="text-xs text-gray-400 hover:text-purple-500 disabled:opacity-40 transition-colors"
+                  >
+                    {motivatorLoading ? '生成中…' : '🔄 再生成'}
+                  </button>
+                )}
+              </div>
+              {motivator ? (
+                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{motivator}</p>
+              ) : (
+                <button
+                  onClick={handleFetchMotivator}
+                  disabled={motivatorLoading}
+                  className="w-full py-2 rounded-lg border border-purple-200 text-sm text-purple-600 font-medium hover:bg-purple-100 disabled:opacity-40 transition-colors"
+                >
+                  {motivatorLoading ? '生成中…' : '「ここが面白い！」をAIに聞く'}
+                </button>
+              )}
             </div>
 
             {/* プレイタイマー */}
