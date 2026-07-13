@@ -28,6 +28,26 @@ export type RawgGame = {
   genre: string | null
 }
 
+// rawgId からゲームの説明文（英語プレーンテキスト）を取得する
+// 取得できない場合は null を返す（Gemini へのフォールバック用）
+export async function getGameDescription(rawgId: number): Promise<string | null> {
+  const apiKey = process.env.RAWG_API_KEY
+  if (!apiKey) return null
+
+  try {
+    const url = `https://api.rawg.io/api/games/${rawgId}?key=${apiKey}`
+    const res = await fetch(url, { next: { revalidate: 3600 } })
+    if (!res.ok) return null
+
+    const data = await res.json()
+    // description_raw はHTMLタグなしのプレーンテキスト
+    const text: string = data.description_raw ?? ''
+    return text.trim() || null
+  } catch {
+    return null
+  }
+}
+
 // ゲームタイトルで検索して上位5件を返す
 export async function searchGames(query: string): Promise<RawgGame[]> {
   const apiKey = process.env.RAWG_API_KEY

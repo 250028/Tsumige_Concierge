@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import prisma from '@/lib/prisma'
 import { sessionOptions, SessionData } from '@/lib/session'
 import { generateSynopsis } from '@/lib/gemini'
+import { getGameDescription } from '@/lib/rawg'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -21,14 +22,22 @@ export async function GET(req: NextRequest, { params }: Params) {
       return NextResponse.json({ message: 'ゲームが見つかりません' }, { status: 404 })
     }
 
-    const synopsis = await generateSynopsis({
-      title:        game.title,
-      genre:        game.genre,
-      platform:     game.platform,
-      status:       game.status,
-      lastPlayedAt: game.lastPlayedAt,
-      progressNote: game.progressNote,
-    })
+    // rawgId があればRAWGの説明文を優先して使う。なければGeminiで生成
+    let synopsis: string | null = null
+    if (game.rawgId) {
+      synopsis = await getGameDescription(game.rawgId)
+    }
+
+    if (!synopsis) {
+      synopsis = await generateSynopsis({
+        title:        game.title,
+        genre:        game.genre,
+        platform:     game.platform,
+        status:       game.status,
+        lastPlayedAt: game.lastPlayedAt,
+        progressNote: game.progressNote,
+      })
+    }
 
     return NextResponse.json({ synopsis })
   } catch (error) {
