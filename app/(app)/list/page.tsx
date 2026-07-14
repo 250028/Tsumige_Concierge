@@ -19,17 +19,23 @@ const STATUS_COLORS: Record<GameStatus, string> = {
 }
 
 type Props = {
-  searchParams: Promise<{ status?: string }>
+  searchParams: Promise<{ status?: string; view?: string }>
 }
 
 export default async function GameListPage({ searchParams }: Props) {
-  const { status } = await searchParams
+  const { status, view } = await searchParams
 
   // セッションからログイン中のユーザーIDを取得
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
 
   // status が正しい値の場合のみ絞り込み条件に使う
   const activeStatus = STATUSES.includes(status as GameStatus) ? (status as GameStatus) : undefined
+  const isGridView = view === 'grid'
+
+  // 表示切り替え後も現在のフィルター条件（status）を維持するためのクエリ文字列
+  const statusQuery = activeStatus ? `status=${encodeURIComponent(activeStatus)}` : ''
+  const listViewHref = statusQuery ? `/list?${statusQuery}` : '/list'
+  const gridViewHref = `/list?${[statusQuery, 'view=grid'].filter(Boolean).join('&')}`
 
   const games = await prisma.game.findMany({
     where: {
@@ -45,6 +51,23 @@ export default async function GameListPage({ searchParams }: Props) {
       <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <h1 className="text-lg font-bold text-purple-600">積みゲーリスト</h1>
         <div className="flex gap-2">
+          {/* リスト⇄グリッド表示切り替え */}
+          <div className="flex rounded-lg border border-gray-300 overflow-hidden text-sm">
+            <Link
+              href={listViewHref}
+              aria-label="リスト表示"
+              className={`px-3 py-2 transition-colors ${!isGridView ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}
+            >
+              ☰
+            </Link>
+            <Link
+              href={gridViewHref}
+              aria-label="グリッド表示"
+              className={`px-3 py-2 transition-colors ${isGridView ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}
+            >
+              ▦
+            </Link>
+          </div>
           <RandomSelectButton />
           <Link
             href="/games/new"
@@ -58,7 +81,7 @@ export default async function GameListPage({ searchParams }: Props) {
       {/* フィルターチップ */}
       <div className="px-4 py-3 flex gap-2 overflow-x-auto">
         <Link
-          href="/list"
+          href={isGridView ? '/list?view=grid' : '/list'}
           className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${
             !activeStatus ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 border border-gray-300'
           }`}
@@ -68,7 +91,7 @@ export default async function GameListPage({ searchParams }: Props) {
         {STATUSES.map(s => (
           <Link
             key={s}
-            href={`/list?status=${encodeURIComponent(s)}`}
+            href={`/list?status=${encodeURIComponent(s)}${isGridView ? '&view=grid' : ''}`}
             className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${
               activeStatus === s ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 border border-gray-300'
             }`}
@@ -86,6 +109,38 @@ export default async function GameListPage({ searchParams }: Props) {
             <Link href="/games/new" className="text-purple-600 font-medium">
               最初の1本を登録する →
             </Link>
+          </div>
+        ) : isGridView ? (
+          // Steam風フルブリードグリッド：枠なし・カバー画像中心
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            {games.map(game => (
+              <Link
+                key={game.id}
+                href={`/games/${game.id}`}
+                className="group"
+              >
+                <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-purple-100">
+                  {game.coverImageUrl ? (
+                    <Image
+                      src={game.coverImageUrl}
+                      alt={game.title}
+                      fill
+                      className="object-cover transition-transform group-hover:scale-105"
+                      unoptimized={game.coverImageUrl.startsWith('/')}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-purple-600">
+                      {game.title.charAt(0)}
+                    </div>
+                  )}
+                  <span className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[game.status]}`}>
+                    {game.status}
+                  </span>
+                </div>
+                <p className="mt-1 text-sm font-medium text-gray-900 truncate">{game.title}</p>
+                <p className="text-xs text-gray-500 truncate">{game.platform ?? '未設定'}</p>
+              </Link>
+            ))}
           </div>
         ) : (
           <ul className="space-y-3">
