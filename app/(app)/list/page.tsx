@@ -117,9 +117,9 @@ export default async function GameListPage({ searchParams }: Props) {
               <Link
                 key={game.id}
                 href={`/games/${game.id}`}
-                className="group"
+                className="group block transition-transform duration-200 hover:-translate-y-1"
               >
-                <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-purple-100">
+                <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-purple-100 group-hover:shadow-md">
                   {game.coverImageUrl ? (
                     <Image
                       src={game.coverImageUrl}
@@ -148,7 +148,7 @@ export default async function GameListPage({ searchParams }: Props) {
               <li key={game.id}>
                 <Link
                   href={`/games/${game.id}`}
-                  className="flex items-center gap-3 bg-white rounded-lg border border-gray-200 p-3 hover:border-purple-300 transition-colors"
+                  className="flex items-center gap-3 bg-white rounded-lg border border-gray-200 p-3 hover:border-purple-300 hover:-translate-y-1 hover:shadow-md transition-all duration-200"
                 >
                   {/* カバー画像（なければ頭文字アイコン） */}
                   <div className="relative w-16 h-12 shrink-0 rounded-lg overflow-hidden bg-purple-100 flex items-center justify-center">

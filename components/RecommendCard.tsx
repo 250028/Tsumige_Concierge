@@ -27,21 +27,21 @@ export default function RecommendCard({ gameId, gameTitle, initialReason }: Prop
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-purple-100 p-4">
+    <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl p-4">
       <div className="flex items-center justify-between mb-1">
-        <p className="text-xs font-bold text-purple-600">✨ コンシェルジュより</p>
+        <p className="text-xs font-bold text-white">✨ コンシェルジュより</p>
         <button
           onClick={handleRefresh}
           disabled={loading}
           title="別の理由を生成"
-          className="text-xs text-gray-400 hover:text-purple-500 disabled:opacity-40 transition-colors"
+          className="text-xs text-white/70 hover:text-white disabled:opacity-40 transition-colors"
         >
           {loading ? '生成中…' : '🔄 別の理由'}
         </button>
       </div>
       <Link href={`/games/${gameId}`} className="block hover:opacity-80 transition-opacity">
-        <h2 className="text-lg font-bold text-gray-900 mb-1">{gameTitle}</h2>
-        <p className="text-sm text-gray-600 leading-relaxed">{reason}</p>
+        <h2 className="text-lg font-bold text-white mb-1">{gameTitle}</h2>
+        <p className="text-sm text-white/90 leading-relaxed">{reason}</p>
       </Link>
     </div>
   )

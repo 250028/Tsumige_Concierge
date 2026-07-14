@@ -80,7 +80,7 @@ export default function CastleClient({
       {/* 城メインカード */}
       <div className={`bg-gradient-to-br ${stage.bg} rounded-2xl border ${stage.border} p-8 text-center`}>
         <div className="text-8xl mb-4">{stage.emoji}</div>
-        <p className={`text-xl font-bold ${stage.color} mb-2`}>{stage.name}</p>
+        <p className="text-xl font-bold mb-2 bg-gradient-to-r from-purple-600 to-amber-400 bg-clip-text text-transparent">{stage.name}</p>
         <p className="text-sm text-gray-600 leading-relaxed">{stage.desc}</p>
       </div>
 
@@ -118,7 +118,7 @@ export default function CastleClient({
           <button
             key={key}
             onClick={() => setModal(key)}
-            className="bg-white rounded-xl border border-gray-200 p-4 text-center hover:border-purple-300 hover:bg-purple-50 transition-colors active:scale-95"
+            className="bg-white rounded-xl border border-gray-200 p-4 text-center hover:border-purple-300 hover:bg-purple-50 hover:-translate-y-1 hover:shadow-md transition-all duration-200 active:scale-95"
           >
             <p className={`text-3xl font-bold ${color}`}>{count}</p>
             <p className="text-xs text-gray-500 mt-1">{label}</p>
@@ -170,11 +170,11 @@ export default function CastleClient({
           onClick={() => setModal(null)}
         >
           <div
-            className="bg-white rounded-2xl w-full max-w-lg max-h-[70vh] flex flex-col"
+            className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl w-full max-w-lg max-h-[70vh] flex flex-col"
             onClick={e => e.stopPropagation()}
           >
             {/* モーダルヘッダー */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/40">
               <p className="font-bold text-gray-800">{modalTitle}（{modalGames.length}本）</p>
               <button
                 onClick={() => setModal(null)}

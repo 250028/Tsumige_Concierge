@@ -135,7 +135,7 @@ export default async function Home() {
               <li key={game.id}>
                 <Link
                   href={`/games/${game.id}`}
-                  className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 p-3 hover:border-purple-300 transition-colors"
+                  className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 p-3 hover:border-purple-300 hover:-translate-y-1 hover:shadow-md transition-all duration-200"
                 >
                   <div className="relative w-9 h-9 shrink-0 rounded-lg overflow-hidden bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-sm">
                     {game.coverImageUrl ? (
