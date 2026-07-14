@@ -2,6 +2,7 @@ import { cookies } from 'next/headers'
 import { getIronSession } from 'iron-session'
 import { unstable_cache } from 'next/cache'
 import Link from 'next/link'
+import Image from 'next/image'
 import prisma from '@/lib/prisma'
 import { sessionOptions, SessionData } from '@/lib/session'
 import { generateRecommendReason } from '@/lib/gemini'
@@ -136,8 +137,18 @@ export default async function Home() {
                   href={`/games/${game.id}`}
                   className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 p-3 hover:border-purple-300 transition-colors"
                 >
-                  <div className="w-9 h-9 shrink-0 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-sm">
-                    {game.title.charAt(0)}
+                  <div className="relative w-9 h-9 shrink-0 rounded-lg overflow-hidden bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-sm">
+                    {game.coverImageUrl ? (
+                      <Image
+                        src={game.coverImageUrl}
+                        alt={game.title}
+                        fill
+                        className="object-cover"
+                        unoptimized={game.coverImageUrl.startsWith('/')}
+                      />
+                    ) : (
+                      game.title.charAt(0)
+                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium text-gray-900 truncate">{game.title}</p>
