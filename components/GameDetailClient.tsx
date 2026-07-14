@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import confetti from 'canvas-confetti'
 import PlayTimer from '@/components/PlayTimer'
 
 const PLATFORMS = ['Switch', 'PS5', 'PS4', 'Xbox', 'PC', 'その他']
@@ -33,6 +34,7 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
   const [error, setError]               = useState('')
   const [loading, setLoading]           = useState(false)
   const [toast, setToast]               = useState('')
+  const [infoToast, setInfoToast]       = useState('')
 
   // カバー画像の状態（アップロードで即時更新）
   const [coverImageUrl, setCoverImageUrl] = useState(game.coverImageUrl)
@@ -132,7 +134,7 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
       return
     }
 
-    // クリア済みになったときにトースト通知（実績も表示）
+    // クリア済みになったときにトースト通知＋紙吹雪（実績も表示）
     if (data.pointsAdded > 0) {
       const achievements: string[] = data.newAchievements ?? []
       const achievementText = achievements.length > 0
@@ -140,6 +142,13 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
         : ''
       setToast(`🎉 クリアおめでとう！+${data.pointsAdded}pt 獲得！${achievementText}`)
       setTimeout(() => setToast(''), 5000)
+
+      // 実績を複数解除したときはより派手に
+      confetti({ particleCount: achievements.length > 0 ? 150 : 80, spread: 70, origin: { y: 0.6 } })
+    } else if (data.alreadyPointsGranted) {
+      // このゲームは以前クリア済みでポイント付与済みのため、再クリアでは付与されない旨を控えめに通知
+      setInfoToast('このゲームはポイント付与済みです')
+      setTimeout(() => setInfoToast(''), 3000)
     }
 
     setEditing(false)
@@ -182,6 +191,13 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
       {toast && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-white px-6 py-3 rounded-full shadow-lg text-sm font-bold animate-bounce">
           {toast}
+        </div>
+      )}
+
+      {/* ポイント付与済み案内（控えめなトースト） */}
+      {infoToast && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-gray-700 text-white px-4 py-2 rounded-full shadow-lg text-xs">
+          {infoToast}
         </div>
       )}
 
@@ -359,13 +375,18 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
               </div>
               {synopsis ? (
                 <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{synopsis}</p>
+              ) : synopsisLoading ? (
+                <div className="animate-pulse space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-full" />
+                  <div className="h-4 bg-gray-200 rounded w-full" />
+                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                </div>
               ) : (
                 <button
                   onClick={handleFetchSynopsis}
-                  disabled={synopsisLoading}
-                  className="w-full py-2 rounded-lg border border-green-200 text-sm text-green-600 font-medium hover:bg-green-100 disabled:opacity-40 transition-colors"
+                  className="w-full py-2 rounded-lg border border-green-200 text-sm text-green-600 font-medium hover:bg-green-100 transition-colors"
                 >
-                  {synopsisLoading ? '生成中…' : 'どんなゲームかAIに聞く'}
+                  どんなゲームかAIに聞く
                 </button>
               )}
             </div>
@@ -386,13 +407,18 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
               </div>
               {motivator ? (
                 <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{motivator}</p>
+              ) : motivatorLoading ? (
+                <div className="animate-pulse space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-full" />
+                  <div className="h-4 bg-gray-200 rounded w-full" />
+                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                </div>
               ) : (
                 <button
                   onClick={handleFetchMotivator}
-                  disabled={motivatorLoading}
-                  className="w-full py-2 rounded-lg border border-purple-200 text-sm text-purple-600 font-medium hover:bg-purple-100 disabled:opacity-40 transition-colors"
+                  className="w-full py-2 rounded-lg border border-purple-200 text-sm text-purple-600 font-medium hover:bg-purple-100 transition-colors"
                 >
-                  {motivatorLoading ? '生成中…' : '「ここが面白い！」をAIに聞く'}
+                  「ここが面白い！」をAIに聞く
                 </button>
               )}
             </div>
@@ -413,13 +439,18 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
               </div>
               {controlGuide ? (
                 <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{controlGuide}</p>
+              ) : controlGuideLoading ? (
+                <div className="animate-pulse space-y-2">
+                  <div className="h-4 bg-gray-200 rounded w-full" />
+                  <div className="h-4 bg-gray-200 rounded w-full" />
+                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                </div>
               ) : (
                 <button
                   onClick={handleFetchControlGuide}
-                  disabled={controlGuideLoading}
-                  className="w-full py-2 rounded-lg border border-blue-200 text-sm text-blue-600 font-medium hover:bg-blue-100 disabled:opacity-40 transition-colors"
+                  className="w-full py-2 rounded-lg border border-blue-200 text-sm text-blue-600 font-medium hover:bg-blue-100 transition-colors"
                 >
-                  {controlGuideLoading ? '生成中…' : '始め方・操作方法をAIに聞く'}
+                  始め方・操作方法をAIに聞く
                 </button>
               )}
             </div>

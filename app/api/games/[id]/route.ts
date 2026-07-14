@@ -68,10 +68,15 @@ export async function PUT(req: NextRequest, { params }: Params) {
     const nextStatus: GameStatus = status ?? result.game.status
     const clearedAt = nextStatus === GameStatus.クリア済み ? new Date() : null
 
-    // 「クリア済み」に初めて変わったときだけポイントを加算（クリア済み→クリア済みは対象外）
-    const justCleared =
+    // 「クリア済み」に変わった（未クリア→クリア済み）タイミングかどうか
+    const enteringCleared =
       nextStatus === GameStatus.クリア済み &&
       result.game!.status !== GameStatus.クリア済み
+
+    // ポイントは初回クリア時のみ付与し、再クリアでは付与しない（pointsGrantedAt で判定）
+    const justCleared = enteringCleared && !result.game!.pointsGrantedAt
+    // すでにポイント付与済みのゲームを再クリアした場合（UIに小さく案内するためのフラグ）
+    const alreadyPointsGranted = enteringCleared && !!result.game!.pointsGrantedAt
 
     const [updated] = await prisma.$transaction([
       prisma.game.update({
@@ -84,6 +89,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
           purchaseDate: purchaseDate ? new Date(purchaseDate) : null,
           progressNote: progressNote || null,
           clearedAt,
+          ...(justCleared ? { pointsGrantedAt: new Date() } : {}),
         },
       }),
       ...(justCleared
@@ -99,7 +105,12 @@ export async function PUT(req: NextRequest, { params }: Params) {
       ? await checkAndGrantAchievements(session.userId)
       : []
 
-    return NextResponse.json({ ...updated, pointsAdded: justCleared ? 100 : 0, newAchievements })
+    return NextResponse.json({
+      ...updated,
+      pointsAdded: justCleared ? 100 : 0,
+      newAchievements,
+      alreadyPointsGranted,
+    })
   } catch (error) {
     console.error(error)
     return NextResponse.json({ message: 'サーバーエラーが発生しました' }, { status: 500 })
