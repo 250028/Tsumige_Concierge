@@ -108,7 +108,7 @@ export default async function ProfilePage() {
           <div className="text-4xl">{rank.icon}</div>
           <div>
             <p className="text-xs text-gray-500 mb-0.5">現在のランク</p>
-            <p className={`text-lg font-bold ${rank.color}`}>{rank.label}</p>
+            <p className="text-lg font-bold bg-gradient-to-r from-purple-600 to-amber-400 bg-clip-text text-transparent">{rank.label}</p>
             <p className="text-xs text-gray-400 mt-0.5">累計 {user.points} pt</p>
           </div>
           <div className="ml-auto text-right">
@@ -133,7 +133,7 @@ export default async function ProfilePage() {
               return (
                 <div
                   key={achievement.id}
-                  className={`flex flex-col items-center text-center p-3 rounded-xl border transition-colors
+                  className={`flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:-translate-y-1 hover:shadow-md
                     ${isEarned
                       ? 'bg-amber-50 border-amber-200'
                       : 'bg-gray-50 border-gray-200 opacity-50'
