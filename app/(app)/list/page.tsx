@@ -30,12 +30,13 @@ export default async function GameListPage({ searchParams }: Props) {
 
   // status が正しい値の場合のみ絞り込み条件に使う
   const activeStatus = STATUSES.includes(status as GameStatus) ? (status as GameStatus) : undefined
-  const isGridView = view === 'grid'
+  // デフォルトはグリッド表示。view=list のときだけリスト表示にする
+  const isGridView = view !== 'list'
 
   // 表示切り替え後も現在のフィルター条件（status）を維持するためのクエリ文字列
   const statusQuery = activeStatus ? `status=${encodeURIComponent(activeStatus)}` : ''
-  const listViewHref = statusQuery ? `/list?${statusQuery}` : '/list'
-  const gridViewHref = `/list?${[statusQuery, 'view=grid'].filter(Boolean).join('&')}`
+  const listViewHref = `/list?${[statusQuery, 'view=list'].filter(Boolean).join('&')}`
+  const gridViewHref = statusQuery ? `/list?${statusQuery}` : '/list'
 
   const games = await prisma.game.findMany({
     where: {
@@ -81,7 +82,7 @@ export default async function GameListPage({ searchParams }: Props) {
       {/* フィルターチップ */}
       <div className="px-4 py-3 flex gap-2 overflow-x-auto">
         <Link
-          href={isGridView ? '/list?view=grid' : '/list'}
+          href={isGridView ? '/list' : '/list?view=list'}
           className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${
             !activeStatus ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 border border-gray-300'
           }`}
@@ -91,7 +92,7 @@ export default async function GameListPage({ searchParams }: Props) {
         {STATUSES.map(s => (
           <Link
             key={s}
-            href={`/list?status=${encodeURIComponent(s)}${isGridView ? '&view=grid' : ''}`}
+            href={`/list?status=${encodeURIComponent(s)}${isGridView ? '' : '&view=list'}`}
             className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${
               activeStatus === s ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 border border-gray-300'
             }`}
