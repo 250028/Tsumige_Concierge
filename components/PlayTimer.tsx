@@ -38,6 +38,7 @@ export default function PlayTimer({ gameId, totalPlayTime, activeSessionId, acti
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const [loading, setLoading] = useState(false)
   const [memo, setMemo] = useState('')
+  const [toast, setToast] = useState('')
 
   // タイマーの進行管理
   // effectボディ内での同期的setStateはカスケードレンダーを引き起こすため、
@@ -67,6 +68,13 @@ export default function PlayTimer({ gameId, totalPlayTime, activeSessionId, acti
       if (data.id) {
         setSessionId(data.id)
         setSessionStartedAt(new Date(data.startedAt))
+      }
+
+      // プレイ開始をきっかけに実績が解除されたらトースト表示
+      const achievements: string[] = data.newAchievements ?? []
+      if (achievements.length > 0) {
+        setToast(`🎉 実績解除：${achievements.join('・')}`)
+        setTimeout(() => setToast(''), 5000)
       }
     } catch {
       alert('通信エラーが発生しました')
@@ -105,6 +113,13 @@ export default function PlayTimer({ gameId, totalPlayTime, activeSessionId, acti
 
   return (
     <div className="border border-purple-100 rounded-xl p-4 bg-purple-50 space-y-3">
+      {/* 実績解除トースト */}
+      {toast && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-white px-6 py-3 rounded-full shadow-lg text-sm font-bold animate-bounce">
+          {toast}
+        </div>
+      )}
+
       <p className="text-sm font-bold text-gray-700">プレイタイマー</p>
 
       {/* 累計プレイ時間 */}

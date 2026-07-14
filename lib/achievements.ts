@@ -27,6 +27,32 @@ const ACHIEVEMENT_CHECKS: {
     },
   },
   {
+    key: 'streak_3days',
+    check: async (userId) => {
+      const sessions = await prisma.playSession.findMany({
+        where: { userId },
+        select: { startedAt: true },
+        orderBy: { startedAt: 'asc' },
+      })
+
+      // 日本時間の日付文字列（YYYY-MM-DD）に変換して重複を除く
+      const days = Array.from(
+        new Set(sessions.map(s => s.startedAt.toLocaleDateString('sv-SE', { timeZone: 'Asia/Tokyo' })))
+      ).sort()
+
+      // 連続した日付が3日以上続く区間があるかチェック
+      let streak = 1
+      for (let i = 1; i < days.length; i++) {
+        const diffDays = Math.round(
+          (new Date(days[i]).getTime() - new Date(days[i - 1]).getTime()) / 86400000
+        )
+        streak = diffDays === 1 ? streak + 1 : 1
+        if (streak >= 3) return true
+      }
+      return false
+    },
+  },
+  {
     key: 'castle_king',
     check: async (userId) => {
       const total = await prisma.game.count({ where: { userId } })
