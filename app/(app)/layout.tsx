@@ -13,8 +13,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
       <div className="flex-1 min-w-0">
         {/* 共通ヘッダー */}
-        <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-          <span className="text-sm text-gray-600">{session.userName} さん</span>
+        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
+          <span className="text-sm text-gray-600 dark:text-gray-300">{session.userName} さん　こんにちは！</span>
           <LogoutButton />
         </header>
 

@@ -97,12 +97,12 @@ export default function NewGamePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900 dark:text-gray-100">
       {/* ヘッダー */}
-      <header className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3">
+      <header className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-3">
         <button
           onClick={() => router.back()}
-          className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+          className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
         >
           ← 一つ前に戻る
         </button>
@@ -114,7 +114,7 @@ export default function NewGamePage() {
 
           {/* タイトル + RAWGで検索 */}
           <div>
-            <label className="block text-sm text-gray-700 mb-1">
+            <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">
               タイトル <span className="text-red-500">*</span>
             </label>
             <div className="flex gap-2">
@@ -124,7 +124,7 @@ export default function NewGamePage() {
                 onChange={e => { setTitle(e.target.value); setSearchResults([]); setCoverImageUrl(null); setRawgId(null) }}
                 placeholder="ゼルダの伝説"
                 required
-                className="flex-1 px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:border-purple-500"
+                className="flex-1 px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-purple-500"
               />
               <button
                 type="button"
@@ -138,13 +138,13 @@ export default function NewGamePage() {
 
             {/* 検索結果ドロップダウン */}
             {searchResults.length > 0 && (
-              <ul className="mt-1 border border-gray-200 rounded-lg overflow-hidden shadow-md">
+              <ul className="mt-1 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-md">
                 {searchResults.map(game => (
                   <li key={game.rawgId}>
                     <button
                       type="button"
                       onClick={() => handleSelectGame(game)}
-                      className="w-full flex items-center gap-3 px-3 py-2 hover:bg-purple-50 transition-colors text-left"
+                      className="w-full flex items-center gap-3 px-3 py-2 bg-white dark:bg-gray-800 hover:bg-purple-50 dark:hover:bg-purple-950 transition-colors text-left"
                     >
                       {game.coverImageUrl ? (
                         <Image
@@ -155,12 +155,12 @@ export default function NewGamePage() {
                           className="rounded object-cover shrink-0"
                         />
                       ) : (
-                        <div className="w-12 h-7 rounded bg-gray-200 shrink-0" />
+                        <div className="w-12 h-7 rounded bg-gray-200 dark:bg-gray-700 shrink-0" />
                       )}
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{game.title}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{game.title}</p>
                         {game.genre && (
-                          <p className="text-xs text-gray-500">{game.genre}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{game.genre}</p>
                         )}
                       </div>
                     </button>
@@ -170,7 +170,7 @@ export default function NewGamePage() {
                   <button
                     type="button"
                     onClick={() => setSearchResults([])}
-                    className="w-full px-3 py-2 text-xs text-gray-400 hover:bg-gray-50 transition-colors text-center"
+                    className="w-full px-3 py-2 bg-white dark:bg-gray-800 text-xs text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-center"
                   >
                     候補を閉じる
                   </button>
@@ -194,7 +194,7 @@ export default function NewGamePage() {
 
             {/* 手動アップロード */}
             <div className="mt-2">
-              <label className="inline-flex items-center gap-1 text-xs text-gray-500 cursor-pointer hover:text-purple-600 transition-colors">
+              <label className="inline-flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 cursor-pointer hover:text-purple-600 transition-colors">
                 <span>{uploading ? 'アップロード中…' : '📁 画像を自分でアップロード'}</span>
                 <input
                   type="file"
@@ -209,23 +209,23 @@ export default function NewGamePage() {
 
           {/* ジャンル */}
           <div>
-            <label className="block text-sm text-gray-700 mb-1">ジャンル</label>
+            <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">ジャンル</label>
             <input
               type="text"
               value={genre}
               onChange={e => setGenre(e.target.value)}
               placeholder="アクションRPG"
-              className="w-full px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:border-purple-500"
+              className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-purple-500"
             />
           </div>
 
           {/* プラットフォーム */}
           <div>
-            <label className="block text-sm text-gray-700 mb-1">プラットフォーム</label>
+            <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">プラットフォーム</label>
             <select
               value={platform}
               onChange={e => setPlatform(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:border-purple-500"
+              className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-purple-500"
             >
               {PLATFORMS.map(p => (
                 <option key={p} value={p}>{p}</option>
@@ -235,11 +235,11 @@ export default function NewGamePage() {
 
           {/* ステータス */}
           <div>
-            <label className="block text-sm text-gray-700 mb-1">ステータス</label>
+            <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">ステータス</label>
             <select
               value={status}
               onChange={e => setStatus(e.target.value as (typeof STATUSES)[number])}
-              className="w-full px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:border-purple-500"
+              className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-purple-500"
             >
               {STATUSES.map(s => (
                 <option key={s} value={s}>{s}</option>
@@ -249,24 +249,24 @@ export default function NewGamePage() {
 
           {/* 購入日 */}
           <div>
-            <label className="block text-sm text-gray-700 mb-1">購入日</label>
+            <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">購入日</label>
             <input
               type="date"
               value={purchaseDate}
               onChange={e => setPurchaseDate(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:border-purple-500"
+              className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-purple-500"
             />
           </div>
 
           {/* 進捗メモ */}
           <div>
-            <label className="block text-sm text-gray-700 mb-1">進捗メモ</label>
+            <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">進捗メモ</label>
             <textarea
               value={progressNote}
               onChange={e => setProgressNote(e.target.value)}
               placeholder="第3の祠まで終了"
               rows={3}
-              className="w-full px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:border-purple-500"
+              className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-purple-500"
             />
           </div>
 

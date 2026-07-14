@@ -77,8 +77,8 @@ export default async function CastlePage() {
   const neededToNext = nextStage ? Math.ceil((nextStage.minRate / 100) * total) - cleared : 0
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-gray-100 pb-24">
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
         <h1 className="text-lg font-bold text-purple-600">積みゲー城</h1>
       </header>
       <CastleClient

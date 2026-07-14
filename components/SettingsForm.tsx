@@ -84,21 +84,21 @@ export default function SettingsForm({ loginId, notificationEnabled: initialNoti
       )}
 
       {/* アカウント情報（読み取り専用） */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-5">
-        <p className="text-sm font-bold text-gray-700 mb-3">アカウント情報</p>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
+        <p className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-3">アカウント情報</p>
         <div className="text-sm">
-          <p className="text-gray-500 mb-1">ログインID</p>
-          <p className="font-medium text-gray-800">{loginId}</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-1">ログインID</p>
+          <p className="font-medium text-gray-800 dark:text-gray-100">{loginId}</p>
         </div>
       </div>
 
       {/* 通知設定 */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-5">
-        <p className="text-sm font-bold text-gray-700 mb-4">通知設定</p>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
+        <p className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-4">通知設定</p>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-700">プッシュ通知</p>
-            <p className="text-xs text-gray-400 mt-0.5">積みゲーに関するお知らせを受け取る</p>
+            <p className="text-sm text-gray-700 dark:text-gray-200">プッシュ通知</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">積みゲーに関するお知らせを受け取る</p>
           </div>
           <button
             onClick={handleNotifToggle}
@@ -107,46 +107,46 @@ export default function SettingsForm({ loginId, notificationEnabled: initialNoti
               notif ? 'bg-purple-600' : 'bg-gray-300'
             } disabled:opacity-50`}
           >
-            <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${
-              notif ? 'translate-x-7' : 'translate-x-1'
+            <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${
+              notif ? 'translate-x-6' : 'translate-x-0'
             }`} />
           </button>
         </div>
       </div>
 
       {/* パスワード変更 */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-5">
-        <p className="text-sm font-bold text-gray-700 mb-4">パスワード変更</p>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
+        <p className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-4">パスワード変更</p>
         <form onSubmit={handlePasswordChange} className="space-y-3">
           <div>
-            <label className="block text-xs text-gray-500 mb-1">現在のパスワード</label>
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">現在のパスワード</label>
             <input
               type="password"
               value={currentPassword}
               onChange={e => setCurrentPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">新しいパスワード（8文字以上）</label>
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">新しいパスワード（8文字以上）</label>
             <input
               type="password"
               value={newPassword}
               onChange={e => setNewPassword(e.target.value)}
               required
               minLength={8}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 mb-1">新しいパスワード（確認）</label>
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">新しいパスワード（確認）</label>
             <input
               type="password"
               value={confirmPassword}
               onChange={e => setConfirmPassword(e.target.value)}
               required
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
             />
           </div>
           <button

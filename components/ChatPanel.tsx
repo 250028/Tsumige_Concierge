@@ -64,14 +64,14 @@ export default function ChatPanel({ onClose }: Props) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-gray-50">
+    <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900">
       {/* ヘッダー */}
-      <div className="px-4 pt-4 pb-2 border-b border-gray-200 bg-white flex items-center justify-between">
-        <p className="text-sm font-bold text-gray-700">💬 AIコンシェルジュ</p>
+      <div className="px-4 pt-4 pb-2 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex items-center justify-between">
+        <p className="text-sm font-bold text-gray-700 dark:text-gray-200">💬 AIコンシェルジュ</p>
         {onClose && (
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-xl leading-none"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none"
             aria-label="閉じる"
           >
             ✕
@@ -80,7 +80,7 @@ export default function ChatPanel({ onClose }: Props) {
       </div>
 
       {/* ペルソナ切り替え */}
-      <div className="px-4 py-2 bg-white border-b border-gray-100 flex gap-2">
+      <div className="px-4 py-2 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex gap-2">
         {(Object.keys(PERSONA_LABELS) as Persona[]).map(p => (
           <button
             key={p}
@@ -88,7 +88,7 @@ export default function ChatPanel({ onClose }: Props) {
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
               persona === p
                 ? 'bg-purple-600 text-white'
-                : 'bg-gray-100 text-gray-500 hover:bg-purple-100'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-purple-900'
             }`}
           >
             {PERSONA_LABELS[p]}
@@ -99,7 +99,7 @@ export default function ChatPanel({ onClose }: Props) {
       {/* メッセージ一覧 */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {messages.length === 0 && (
-          <div className="text-center text-gray-400 text-sm pt-8">
+          <div className="text-center text-gray-400 dark:text-gray-500 text-sm pt-8">
             <p>「スカッとしたい」「2時間ある」など、</p>
             <p>気分や状況を話しかけてみてください。</p>
           </div>
@@ -110,7 +110,7 @@ export default function ChatPanel({ onClose }: Props) {
               className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm leading-relaxed whitespace-pre-wrap ${
                 msg.role === 'user'
                   ? 'bg-purple-600 text-white rounded-br-sm'
-                  : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm'
+                  : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100 rounded-bl-sm'
               }`}
             >
               {msg.text}
@@ -119,7 +119,7 @@ export default function ChatPanel({ onClose }: Props) {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-4 py-2 text-sm text-gray-400">
+            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl rounded-bl-sm px-4 py-2 text-sm text-gray-400 dark:text-gray-500">
               考え中…
             </div>
           </div>
@@ -128,7 +128,7 @@ export default function ChatPanel({ onClose }: Props) {
       </div>
 
       {/* 入力欄 */}
-      <div className="px-4 py-3 border-t border-gray-200 bg-white flex gap-2 items-center">
+      <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex gap-2 items-center">
         <input
           type="text"
           value={input}
@@ -136,7 +136,7 @@ export default function ChatPanel({ onClose }: Props) {
           onKeyDown={handleKeyDown}
           placeholder="「スカッとしたい」「2時間ある」など…"
           disabled={loading}
-          className="flex-1 px-4 py-2 rounded-full bg-gray-100 text-sm text-gray-800 placeholder-gray-400 outline-none focus:ring-2 focus:ring-purple-300 disabled:cursor-not-allowed"
+          className="flex-1 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 outline-none focus:ring-2 focus:ring-purple-300 disabled:cursor-not-allowed"
         />
         <button
           onClick={handleSend}

@@ -8,6 +8,8 @@ import { sessionOptions, SessionData } from '@/lib/session'
 import { generateRecommendReason } from '@/lib/gemini'
 import RandomSelectButton from '@/components/RandomSelectButton'
 import RecommendCard from '@/components/RecommendCard'
+import CountUp from '@/components/CountUp'
+import EmptyState from '@/components/EmptyState'
 
 export default async function Home() {
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
@@ -54,34 +56,34 @@ export default async function Home() {
   const recentGames = games.slice(0, 3)
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-50 dark:bg-gray-900 dark:text-gray-100 min-h-screen">
       {/* 統計バッジ */}
       <div className="px-4 pt-4 flex gap-2">
-        <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-600 text-sm font-semibold">
-          積み {total}
+        <span className="px-3 py-1 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-300 text-sm font-semibold">
+          積み <CountUp value={total} />
         </span>
-        <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-600 text-sm font-semibold">
-          済 {cleared}
+        <span className="px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 text-sm font-semibold">
+          済 <CountUp value={cleared} />
         </span>
       </div>
 
       {/* 統計グリッド（PCのみ） */}
       <div className="hidden md:grid grid-cols-4 gap-3 px-4 pt-4">
-        <div className="bg-white rounded-xl border border-purple-100 p-3">
-          <p className="text-xs text-gray-500">積みゲー総数</p>
-          <p className="text-2xl font-bold">{total}</p>
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-purple-100 dark:border-gray-700 p-3">
+          <p className="text-xs text-gray-500 dark:text-gray-400">積みゲー総数</p>
+          <p className="text-2xl font-bold"><CountUp value={total} /></p>
         </div>
-        <div className="bg-white rounded-xl border border-purple-100 p-3">
-          <p className="text-xs text-gray-500">プレイ中</p>
-          <p className="text-2xl font-bold">{playing}</p>
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-purple-100 dark:border-gray-700 p-3">
+          <p className="text-xs text-gray-500 dark:text-gray-400">プレイ中</p>
+          <p className="text-2xl font-bold"><CountUp value={playing} /></p>
         </div>
-        <div className="bg-white rounded-xl border border-purple-100 p-3">
-          <p className="text-xs text-gray-500">クリア済み</p>
-          <p className="text-2xl font-bold">{cleared}</p>
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-purple-100 dark:border-gray-700 p-3">
+          <p className="text-xs text-gray-500 dark:text-gray-400">クリア済み</p>
+          <p className="text-2xl font-bold"><CountUp value={cleared} /></p>
         </div>
-        <div className="bg-white rounded-xl border border-purple-100 p-3">
-          <p className="text-xs text-gray-500">消化率</p>
-          <p className="text-2xl font-bold">{clearRate}%</p>
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-purple-100 dark:border-gray-700 p-3">
+          <p className="text-xs text-gray-500 dark:text-gray-400">消化率</p>
+          <p className="text-2xl font-bold"><CountUp value={clearRate} suffix="%" /></p>
         </div>
       </div>
 
@@ -103,22 +105,22 @@ export default async function Home() {
 
       {/* おまかせセレクト */}
       <div className="px-4 pt-6">
-        <p className="text-xs font-bold text-gray-500 tracking-wide mb-2">🎲 おまかせで選ぶ</p>
-        <div className="bg-white rounded-2xl border border-amber-100 p-4 flex items-center justify-between">
-          <p className="text-sm text-gray-500">今日何やるか迷ったら</p>
+        <p className="text-xs font-bold text-gray-500 dark:text-gray-400 tracking-wide mb-2">🎲 おまかせで選ぶ</p>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-amber-100 dark:border-gray-700 p-4 flex items-center justify-between">
+          <p className="text-sm text-gray-500 dark:text-gray-400">今日何やるか迷ったら</p>
           <RandomSelectButton />
         </div>
       </div>
 
       {/* AIチャットストリップ */}
       <div className="px-4 pt-6">
-        <p className="text-xs font-bold text-gray-500 tracking-wide mb-2">💬 コンシェルジュに話す</p>
+        <p className="text-xs font-bold text-gray-500 dark:text-gray-400 tracking-wide mb-2">💬 コンシェルジュに話す</p>
         <Link
           href="/chat"
-          className="block bg-white rounded-2xl border border-purple-100 p-4 hover:border-purple-300 transition-colors"
+          className="block bg-white dark:bg-gray-800 rounded-2xl border border-purple-100 dark:border-gray-700 p-4 hover:border-purple-300 transition-colors"
         >
-          <p className="text-sm text-gray-500 mb-3">AIコンシェルジュに気分や状況を話しかけてみよう</p>
-          <div className="w-full px-4 py-2 rounded-full bg-gray-100 text-gray-400 text-sm">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">AIコンシェルジュに気分や状況を話しかけてみよう</p>
+          <div className="w-full px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500 text-sm">
             「スカッとしたい」「2時間ある」など…
           </div>
         </Link>
@@ -126,18 +128,18 @@ export default async function Home() {
 
       {/* 最近の積みゲー */}
       <div className="px-4 pt-6 pb-6">
-        <p className="text-xs font-bold text-gray-500 tracking-wide mb-2">📋 最近の積みゲー</p>
+        <p className="text-xs font-bold text-gray-500 dark:text-gray-400 tracking-wide mb-2">📋 最近の積みゲー</p>
         {recentGames.length === 0 ? (
-          <p className="text-center text-gray-400 py-6">まだ登録がありません</p>
+          <EmptyState message="まだ登録がありません" />
         ) : (
           <ul className="space-y-2">
             {recentGames.map(game => (
               <li key={game.id}>
                 <Link
                   href={`/games/${game.id}`}
-                  className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 p-3 hover:border-purple-300 hover:-translate-y-1 hover:shadow-md transition-all duration-200"
+                  className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-3 hover:border-purple-300 hover:-translate-y-1 hover:shadow-md transition-all duration-200"
                 >
-                  <div className="relative w-9 h-9 shrink-0 rounded-lg overflow-hidden bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-sm">
+                  <div className="relative w-9 h-9 shrink-0 rounded-lg overflow-hidden bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-300 flex items-center justify-center font-bold text-sm">
                     {game.coverImageUrl ? (
                       <Image
                         src={game.coverImageUrl}
@@ -151,10 +153,10 @@ export default async function Home() {
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-gray-900 truncate">{game.title}</p>
-                    <p className="text-xs text-gray-500">{game.genre ?? '未設定'} ・ {game.platform ?? '未設定'}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{game.title}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{game.genre ?? '未設定'} ・ {game.platform ?? '未設定'}</p>
                   </div>
-                  <span className="shrink-0 text-xs text-gray-500">{game.status}</span>
+                  <span className="shrink-0 text-xs text-gray-500 dark:text-gray-400">{game.status}</span>
                 </Link>
               </li>
             ))}

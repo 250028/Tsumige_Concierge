@@ -26,7 +26,22 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* ページ描画前にテーマを適用し、ダーク→ライトのちらつき（FOUC）を防ぐ */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                var saved = localStorage.getItem('theme');
+                var isDark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (isDark) document.documentElement.classList.add('dark');
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

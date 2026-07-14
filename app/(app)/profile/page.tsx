@@ -4,13 +4,14 @@ import { getIronSession } from 'iron-session'
 import prisma from '@/lib/prisma'
 import { sessionOptions, SessionData } from '@/lib/session'
 import ProfileForm from '@/components/ProfileForm'
+import CountUp from '@/components/CountUp'
 
 // ポイント数に応じたランク定義
 const RANKS = [
-  { minPoints: 500, label: 'レジェンドゲーマー', color: 'text-amber-600',  bg: 'bg-amber-50',  border: 'border-amber-200',  icon: '👑' },
-  { minPoints: 200, label: '積みゲーハンター',   color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200', icon: '🏆' },
-  { minPoints:  50, label: 'ゲーム消化人',       color: 'text-blue-600',   bg: 'bg-blue-50',   border: 'border-blue-200',   icon: '🎮' },
-  { minPoints:   0, label: '積みゲー見習い',     color: 'text-gray-600',   bg: 'bg-gray-50',   border: 'border-gray-200',   icon: '📦' },
+  { minPoints: 500, label: 'レジェンドゲーマー', color: 'text-amber-600',  bg: 'bg-amber-50 dark:bg-amber-950',  border: 'border-amber-200 dark:border-amber-800',  icon: '👑' },
+  { minPoints: 200, label: '積みゲーハンター',   color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-950', border: 'border-purple-200 dark:border-purple-800', icon: '🏆' },
+  { minPoints:  50, label: 'ゲーム消化人',       color: 'text-blue-600',   bg: 'bg-blue-50 dark:bg-blue-950',   border: 'border-blue-200 dark:border-blue-800',   icon: '🎮' },
+  { minPoints:   0, label: '積みゲー見習い',     color: 'text-gray-600',   bg: 'bg-gray-50 dark:bg-gray-800',   border: 'border-gray-200 dark:border-gray-700',   icon: '📦' },
 ]
 
 function getRank(points: number) {
@@ -59,14 +60,14 @@ export default async function ProfilePage() {
   const earnedIds = new Map(userAchievements.map(ua => [ua.achievementId, ua.achievedAt]))
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-gray-100 pb-24">
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
         <h1 className="text-lg font-bold text-purple-600">プロフィール</h1>
       </header>
 
       <div className="px-4 pt-6 max-w-lg mx-auto space-y-6">
         {/* 編集フォーム */}
-        <div className="bg-white rounded-2xl border border-purple-100 p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-purple-100 dark:border-gray-700 p-6">
           <ProfileForm
             initialName={user.name}
             initialGamingSince={user.gamingSince}
@@ -76,28 +77,28 @@ export default async function ProfilePage() {
         </div>
 
         {/* 統計カード */}
-        <div className="bg-white rounded-2xl border border-purple-100 p-6">
-          <p className="text-sm font-bold text-gray-700 mb-4">ゲーマー統計</p>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-purple-100 dark:border-gray-700 p-6">
+          <p className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-4">ゲーマー統計</p>
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-purple-50 rounded-xl p-3 text-center">
-              <p className="text-2xl font-bold text-purple-600">{total}</p>
-              <p className="text-xs text-gray-500 mt-1">積みゲー総数</p>
+            <div className="bg-purple-50 dark:bg-purple-950 rounded-xl p-3 text-center">
+              <p className="text-2xl font-bold text-purple-600"><CountUp value={total} /></p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">積みゲー総数</p>
             </div>
-            <div className="bg-amber-50 rounded-xl p-3 text-center">
-              <p className="text-2xl font-bold text-amber-600">{cleared}</p>
-              <p className="text-xs text-gray-500 mt-1">クリア済み</p>
+            <div className="bg-amber-50 dark:bg-amber-950 rounded-xl p-3 text-center">
+              <p className="text-2xl font-bold text-amber-600"><CountUp value={cleared} /></p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">クリア済み</p>
             </div>
-            <div className="bg-green-50 rounded-xl p-3 text-center">
-              <p className="text-2xl font-bold text-green-600">{playing}</p>
-              <p className="text-xs text-gray-500 mt-1">プレイ中</p>
+            <div className="bg-green-50 dark:bg-green-950 rounded-xl p-3 text-center">
+              <p className="text-2xl font-bold text-green-600"><CountUp value={playing} /></p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">プレイ中</p>
             </div>
-            <div className="bg-blue-50 rounded-xl p-3 text-center">
-              <p className="text-2xl font-bold text-blue-600">{clearRate}%</p>
-              <p className="text-xs text-gray-500 mt-1">消化率</p>
+            <div className="bg-blue-50 dark:bg-blue-950 rounded-xl p-3 text-center">
+              <p className="text-2xl font-bold text-blue-600"><CountUp value={clearRate} suffix="%" /></p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">消化率</p>
             </div>
           </div>
           {gamingYears && (
-            <p className="text-center text-xs text-gray-400 mt-4">
+            <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-4">
               ゲーマー歴 {gamingYears} 年のベテラン
             </p>
           )}
@@ -107,14 +108,14 @@ export default async function ProfilePage() {
         <div className={`${rank.bg} rounded-2xl border ${rank.border} p-5 flex items-center gap-4`}>
           <div className="text-4xl">{rank.icon}</div>
           <div>
-            <p className="text-xs text-gray-500 mb-0.5">現在のランク</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">現在のランク</p>
             <p className="text-lg font-bold bg-gradient-to-r from-purple-600 to-amber-400 bg-clip-text text-transparent">{rank.label}</p>
-            <p className="text-xs text-gray-400 mt-0.5">累計 {user.points} pt</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">累計 <CountUp value={user.points} /> pt</p>
           </div>
           <div className="ml-auto text-right">
             {RANKS.find(r => r.minPoints > user.points) && (
               <>
-                <p className="text-xs text-gray-400">次のランクまで</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">次のランクまで</p>
                 <p className={`text-sm font-bold ${rank.color}`}>
                   {(RANKS.find(r => r.minPoints > user.points)!.minPoints - user.points)} pt
                 </p>
@@ -124,8 +125,8 @@ export default async function ProfilePage() {
         </div>
 
         {/* 実績バッジ */}
-        <div className="bg-white rounded-2xl border border-purple-100 p-6">
-          <p className="text-sm font-bold text-gray-700 mb-4">実績</p>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-purple-100 dark:border-gray-700 p-6">
+          <p className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-4">実績</p>
           <div className="grid grid-cols-3 gap-3">
             {allAchievements.map(achievement => {
               const earnedAt = earnedIds.get(achievement.id)
@@ -135,16 +136,16 @@ export default async function ProfilePage() {
                   key={achievement.id}
                   className={`flex flex-col items-center text-center p-3 rounded-xl border transition-all duration-200 hover:-translate-y-1 hover:shadow-md
                     ${isEarned
-                      ? 'bg-amber-50 border-amber-200'
-                      : 'bg-gray-50 border-gray-200 opacity-50'
+                      ? 'bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800'
+                      : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 opacity-50'
                     }`}
                 >
                   <span className="text-2xl mb-1">{isEarned ? achievement.icon : '🔒'}</span>
-                  <p className={`text-xs font-bold leading-tight ${isEarned ? 'text-amber-700' : 'text-gray-500'}`}>
+                  <p className={`text-xs font-bold leading-tight ${isEarned ? 'text-amber-700 dark:text-amber-400' : 'text-gray-500 dark:text-gray-400'}`}>
                     {isEarned ? achievement.name : '???'}
                   </p>
                   {isEarned && earnedAt && (
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                       {new Date(earnedAt).toLocaleDateString('ja-JP')}
                     </p>
                   )}
@@ -155,21 +156,21 @@ export default async function ProfilePage() {
         </div>
 
         {/* アカウント情報（読み取り専用） */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-          <p className="text-sm font-bold text-gray-700 mb-3">アカウント情報</p>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+          <p className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-3">アカウント情報</p>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <dt className="text-gray-500">ログインID</dt>
-              <dd className="font-medium text-gray-800">{user.loginId}</dd>
+              <dt className="text-gray-500 dark:text-gray-400">ログインID</dt>
+              <dd className="font-medium text-gray-800 dark:text-gray-100">{user.loginId}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-gray-500">登録日</dt>
-              <dd className="font-medium text-gray-800">
+              <dt className="text-gray-500 dark:text-gray-400">登録日</dt>
+              <dd className="font-medium text-gray-800 dark:text-gray-100">
                 {user.createdAt.toLocaleDateString('ja-JP')}
               </dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-gray-500">累計ポイント</dt>
+              <dt className="text-gray-500 dark:text-gray-400">累計ポイント</dt>
               <dd className="font-medium text-amber-600">{user.points} pt</dd>
             </div>
           </dl>
@@ -179,13 +180,13 @@ export default async function ProfilePage() {
         <div className="md:hidden">
           <Link
             href="/settings"
-            className="flex items-center justify-between bg-white rounded-2xl border border-gray-200 p-5 hover:bg-gray-50 transition-colors"
+            className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
             <div className="flex items-center gap-3">
               <span className="text-xl">⚙️</span>
-              <span className="text-sm font-medium text-gray-700">設定</span>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">設定</span>
             </div>
-            <span className="text-gray-400 text-sm">›</span>
+            <span className="text-gray-400 dark:text-gray-500 text-sm">›</span>
           </Link>
         </div>
       </div>

@@ -87,7 +87,7 @@ export default function ProfileForm({ initialName, initialGamingSince, initialPe
         <button
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="relative w-24 h-24 rounded-full overflow-hidden bg-purple-100 border-2 border-purple-300 hover:border-purple-500 transition-colors"
+          className="relative w-24 h-24 rounded-full overflow-hidden bg-purple-100 dark:bg-purple-950 border-2 border-purple-300 dark:border-purple-700 hover:border-purple-500 transition-colors"
         >
           {avatarUrl ? (
             <Image src={avatarUrl} alt="アバター" fill className="object-cover" />
@@ -100,7 +100,7 @@ export default function ProfileForm({ initialName, initialGamingSince, initialPe
             </div>
           )}
         </button>
-        <p className="text-xs text-gray-400">タップして画像を変更</p>
+        <p className="text-xs text-gray-400 dark:text-gray-500">タップして画像を変更</p>
         <input
           ref={fileInputRef}
           type="file"
@@ -112,19 +112,19 @@ export default function ProfileForm({ initialName, initialGamingSince, initialPe
 
       {/* ユーザー名 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">ユーザー名</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">ユーザー名</label>
         <input
           type="text"
           value={name}
           onChange={e => setName(e.target.value)}
           maxLength={100}
-          className="w-full px-4 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+          className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
         />
       </div>
 
       {/* ゲーマー歴（開始年） */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">ゲームを始めた年</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">ゲームを始めた年</label>
         <input
           type="number"
           value={gamingSince}
@@ -132,10 +132,10 @@ export default function ProfileForm({ initialName, initialGamingSince, initialPe
           min={1970}
           max={new Date().getFullYear()}
           placeholder="例: 2010"
-          className="w-full px-4 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+          className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
         />
         {gamingSince && (
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
             ゲーマー歴 {new Date().getFullYear() - Number(gamingSince) + 1} 年
           </p>
         )}
@@ -143,7 +143,7 @@ export default function ProfileForm({ initialName, initialGamingSince, initialPe
 
       {/* ペルソナ選択 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">AIコンシェルジュのペルソナ</label>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">AIコンシェルジュのペルソナ</label>
         <div className="flex gap-2 flex-wrap">
           {(Object.keys(PERSONA_LABELS) as Persona[]).map(p => (
             <button
@@ -152,7 +152,7 @@ export default function ProfileForm({ initialName, initialGamingSince, initialPe
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 persona === p
                   ? 'bg-purple-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-purple-100'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-purple-900'
               }`}
             >
               {PERSONA_LABELS[p]}

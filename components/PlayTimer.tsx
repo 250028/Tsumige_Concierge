@@ -112,7 +112,7 @@ export default function PlayTimer({ gameId, totalPlayTime, activeSessionId, acti
   const displayTotal = totalPlayTime + currentSessionMinutes
 
   return (
-    <div className="border border-purple-100 rounded-xl p-4 bg-purple-50 space-y-3">
+    <div className="border border-purple-100 dark:border-purple-800 rounded-xl p-4 bg-purple-50 dark:bg-purple-950 space-y-3">
       {/* 実績解除トースト */}
       {toast && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-white px-6 py-3 rounded-full shadow-lg text-sm font-bold animate-bounce">
@@ -120,20 +120,20 @@ export default function PlayTimer({ gameId, totalPlayTime, activeSessionId, acti
         </div>
       )}
 
-      <p className="text-sm font-bold text-gray-700">プレイタイマー</p>
+      <p className="text-sm font-bold text-gray-700 dark:text-gray-200">プレイタイマー</p>
 
       {/* 累計プレイ時間 */}
       <div className="flex justify-between items-center">
-        <p className="text-xs text-gray-500">累計プレイ時間</p>
-        <p className="text-sm font-bold text-purple-700">
+        <p className="text-xs text-gray-500 dark:text-gray-400">累計プレイ時間</p>
+        <p className="text-sm font-bold text-purple-700 dark:text-purple-300">
           {displayTotal > 0 ? formatMinutes(displayTotal) : '未記録'}
         </p>
       </div>
 
       {/* 現在のセッション計測 */}
       {isRunning && (
-        <div className="text-center bg-white rounded-lg py-3 border border-purple-200">
-          <p className="text-xs text-gray-400 mb-1">プレイ中</p>
+        <div className="text-center bg-white dark:bg-gray-800 rounded-lg py-3 border border-purple-200 dark:border-purple-800">
+          <p className="text-xs text-gray-400 dark:text-gray-500 mb-1">プレイ中</p>
           <p className="text-3xl font-mono font-bold text-purple-600">
             {formatSeconds(elapsed)}
           </p>
@@ -148,7 +148,7 @@ export default function PlayTimer({ gameId, totalPlayTime, activeSessionId, acti
             onChange={e => setMemo(e.target.value)}
             placeholder="今日の進捗メモ（任意）"
             rows={2}
-            className="w-full px-3 py-2 rounded-lg bg-white border border-purple-200 text-sm text-gray-800 placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-purple-300"
+            className="w-full px-3 py-2 rounded-lg bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-800 text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-none focus:outline-none focus:ring-2 focus:ring-purple-300"
           />
           <button
             onClick={handleStop}
