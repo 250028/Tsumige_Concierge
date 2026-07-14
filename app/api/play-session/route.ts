@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { getIronSession } from 'iron-session'
 import prisma from '@/lib/prisma'
 import { sessionOptions, SessionData } from '@/lib/session'
+import { checkAndGrantAchievements } from '@/lib/achievements'
 
 // プレイセッションを開始する
 export async function POST(req: Request) {
@@ -46,5 +47,8 @@ export async function POST(req: Request) {
     })
   }
 
-  return NextResponse.json({ id: playSession.id, startedAt: playSession.startedAt })
+  // プレイセッションを記録したタイミングで「連続3日」実績をチェック
+  const newAchievements = await checkAndGrantAchievements(session.userId)
+
+  return NextResponse.json({ id: playSession.id, startedAt: playSession.startedAt, newAchievements })
 }
