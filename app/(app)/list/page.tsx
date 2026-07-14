@@ -6,16 +6,17 @@ import { GameStatus } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { sessionOptions, SessionData } from '@/lib/session'
 import RandomSelectButton from '@/components/RandomSelectButton'
+import EmptyState from '@/components/EmptyState'
 
 const STATUSES: GameStatus[] = ['未開封', '序盤で放置', '中断中', 'プレイ中', 'クリア済み']
 
 // ステータスごとのバッジ色
 const STATUS_COLORS: Record<GameStatus, string> = {
-  未開封:     'bg-gray-200 text-gray-700',
-  序盤で放置: 'bg-yellow-100 text-yellow-700',
-  中断中:     'bg-orange-100 text-orange-700',
-  プレイ中:   'bg-purple-100 text-purple-700',
-  クリア済み: 'bg-amber-100 text-amber-700',
+  未開封:     'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200',
+  序盤で放置: 'bg-yellow-100 dark:bg-yellow-950 text-yellow-700 dark:text-yellow-400',
+  中断中:     'bg-orange-100 dark:bg-orange-950 text-orange-700 dark:text-orange-400',
+  プレイ中:   'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300',
+  クリア済み: 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400',
 }
 
 type Props = {
@@ -47,24 +48,24 @@ export default async function GameListPage({ searchParams }: Props) {
   })
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 dark:text-gray-100 pb-24">
       {/* ヘッダー */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
         <h1 className="text-lg font-bold text-purple-600">積みゲーリスト</h1>
         <div className="flex gap-2">
           {/* リスト⇄グリッド表示切り替え */}
-          <div className="flex rounded-lg border border-gray-300 overflow-hidden text-sm">
+          <div className="flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden text-sm">
             <Link
               href={listViewHref}
               aria-label="リスト表示"
-              className={`px-3 py-2 transition-colors ${!isGridView ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}
+              className={`px-3 py-2 transition-colors ${!isGridView ? 'bg-purple-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}
             >
               ☰
             </Link>
             <Link
               href={gridViewHref}
               aria-label="グリッド表示"
-              className={`px-3 py-2 transition-colors ${isGridView ? 'bg-purple-600 text-white' : 'bg-white text-gray-600'}`}
+              className={`px-3 py-2 transition-colors ${isGridView ? 'bg-purple-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300'}`}
             >
               ▦
             </Link>
@@ -84,7 +85,7 @@ export default async function GameListPage({ searchParams }: Props) {
         <Link
           href={isGridView ? '/list' : '/list?view=list'}
           className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${
-            !activeStatus ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 border border-gray-300'
+            !activeStatus ? 'bg-purple-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600'
           }`}
         >
           すべて
@@ -94,7 +95,7 @@ export default async function GameListPage({ searchParams }: Props) {
             key={s}
             href={`/list?status=${encodeURIComponent(s)}${isGridView ? '' : '&view=list'}`}
             className={`px-3 py-1 rounded-full text-sm whitespace-nowrap ${
-              activeStatus === s ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 border border-gray-300'
+              activeStatus === s ? 'bg-purple-600 text-white' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600'
             }`}
           >
             {s}
@@ -105,11 +106,13 @@ export default async function GameListPage({ searchParams }: Props) {
       {/* ゲーム一覧 */}
       <main className="px-4">
         {games.length === 0 ? (
-          <div className="text-center text-gray-400 py-16">
-            <p className="mb-4">積みゲーはまだ登録されていません</p>
-            <Link href="/games/new" className="text-purple-600 font-medium">
-              最初の1本を登録する →
-            </Link>
+          <div>
+            <EmptyState message="積みゲーはまだ登録されていません" />
+            <div className="text-center -mt-4">
+              <Link href="/games/new" className="text-purple-600 font-medium">
+                最初の1本を登録する →
+              </Link>
+            </div>
           </div>
         ) : isGridView ? (
           // Steam風フルブリードグリッド：枠なし・カバー画像中心
@@ -120,7 +123,7 @@ export default async function GameListPage({ searchParams }: Props) {
                 href={`/games/${game.id}`}
                 className="group block transition-transform duration-200 hover:-translate-y-1"
               >
-                <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-purple-100 group-hover:shadow-md">
+                <div className="relative aspect-[3/4] w-full rounded-lg overflow-hidden bg-purple-100 dark:bg-purple-950 group-hover:shadow-md">
                   {game.coverImageUrl ? (
                     <Image
                       src={game.coverImageUrl}
@@ -130,7 +133,7 @@ export default async function GameListPage({ searchParams }: Props) {
                       unoptimized={game.coverImageUrl.startsWith('/')}
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-purple-600">
+                    <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-purple-600 dark:text-purple-300">
                       {game.title.charAt(0)}
                     </div>
                   )}
@@ -138,8 +141,8 @@ export default async function GameListPage({ searchParams }: Props) {
                     {game.status}
                   </span>
                 </div>
-                <p className="mt-1 text-sm font-medium text-gray-900 truncate">{game.title}</p>
-                <p className="text-xs text-gray-500 truncate">{game.platform ?? '未設定'}</p>
+                <p className="mt-1 text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{game.title}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{game.platform ?? '未設定'}</p>
               </Link>
             ))}
           </div>
@@ -149,10 +152,10 @@ export default async function GameListPage({ searchParams }: Props) {
               <li key={game.id}>
                 <Link
                   href={`/games/${game.id}`}
-                  className="flex items-center gap-3 bg-white rounded-lg border border-gray-200 p-3 hover:border-purple-300 hover:-translate-y-1 hover:shadow-md transition-all duration-200"
+                  className="flex items-center gap-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-3 hover:border-purple-300 hover:-translate-y-1 hover:shadow-md transition-all duration-200"
                 >
                   {/* カバー画像（なければ頭文字アイコン） */}
-                  <div className="relative w-16 h-12 shrink-0 rounded-lg overflow-hidden bg-purple-100 flex items-center justify-center">
+                  <div className="relative w-16 h-12 shrink-0 rounded-lg overflow-hidden bg-purple-100 dark:bg-purple-950 flex items-center justify-center">
                     {game.coverImageUrl ? (
                       <Image
                         src={game.coverImageUrl}
@@ -162,15 +165,15 @@ export default async function GameListPage({ searchParams }: Props) {
                         unoptimized={game.coverImageUrl.startsWith('/')}
                       />
                     ) : (
-                      <span className="text-purple-600 font-bold">{game.title.charAt(0)}</span>
+                      <span className="text-purple-600 dark:text-purple-300 font-bold">{game.title.charAt(0)}</span>
                     )}
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-gray-900 truncate">{game.title}</p>
-                    <p className="text-xs text-gray-500">{game.platform ?? '未設定'}</p>
+                    <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{game.title}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{game.platform ?? '未設定'}</p>
                     {game.progressNote && (
-                      <p className="text-xs text-gray-400 truncate">{game.progressNote}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500 truncate">{game.progressNote}</p>
                     )}
                   </div>
 

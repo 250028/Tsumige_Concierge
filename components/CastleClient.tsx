@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import CountUp from '@/components/CountUp'
+import EmptyState from '@/components/EmptyState'
 
 type Game = {
   id: number
@@ -78,30 +80,30 @@ export default function CastleClient({
   return (
     <div className="px-4 pt-6 max-w-lg mx-auto space-y-6">
       {/* 城メインカード */}
-      <div className={`bg-gradient-to-br ${stage.bg} rounded-2xl border ${stage.border} p-8 text-center`}>
+      <div className={`bg-gradient-to-br ${stage.bg} dark:bg-none dark:bg-gray-800 rounded-2xl border ${stage.border} dark:border-gray-700 p-8 text-center`}>
         <div className="text-8xl mb-4">{stage.emoji}</div>
         <p className="text-xl font-bold mb-2 bg-gradient-to-r from-purple-600 to-amber-400 bg-clip-text text-transparent">{stage.name}</p>
-        <p className="text-sm text-gray-600 leading-relaxed">{stage.desc}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{stage.desc}</p>
       </div>
 
       {/* 消化率プログレスバー */}
-      <div className="bg-white rounded-2xl border border-purple-100 p-5">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-purple-100 dark:border-gray-700 p-5">
         <div className="flex justify-between items-center mb-2">
-          <p className="text-sm font-bold text-gray-700">消化率</p>
-          <p className="text-2xl font-bold text-purple-600">{clearRate}%</p>
+          <p className="text-sm font-bold text-gray-700 dark:text-gray-200">消化率</p>
+          <p className="text-2xl font-bold text-purple-600"><CountUp value={clearRate} suffix="%" /></p>
         </div>
-        <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
+        <div className="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
           <div
             className="h-4 rounded-full bg-gradient-to-r from-purple-500 to-amber-400 transition-all duration-700"
             style={{ width: `${clearRate}%` }}
           />
         </div>
-        <div className="flex justify-between mt-2 text-xs text-gray-400">
+        <div className="flex justify-between mt-2 text-xs text-gray-400 dark:text-gray-500">
           <span>0%（廃墟）</span>
           <span>100%（黄金の大城）</span>
         </div>
         {nextStageName && total > 0 && (
-          <p className="mt-3 text-xs text-center text-gray-500">
+          <p className="mt-3 text-xs text-center text-gray-500 dark:text-gray-400">
             あと <span className="font-bold text-purple-600">{neededToNext}本</span> クリアすると「{nextStageName}」に進化！
           </p>
         )}
@@ -110,7 +112,7 @@ export default function CastleClient({
       {/* 統計グリッド（タップでモーダル） */}
       <div className="grid grid-cols-2 gap-3">
         {[
-          { key: 'stacked' as ModalKey,          count: stacked,          label: '積みゲー残数',   color: 'text-gray-800' },
+          { key: 'stacked' as ModalKey,          count: stacked,          label: '積みゲー残数',   color: 'text-gray-800 dark:text-gray-200' },
           { key: 'cleared' as ModalKey,           count: cleared,          label: '総クリア数',     color: 'text-amber-500' },
           { key: 'playing' as ModalKey,           count: playing,          label: 'プレイ中',       color: 'text-purple-500' },
           { key: 'clearedThisMonth' as ModalKey,  count: clearedThisMonth, label: '今月のクリア',   color: 'text-green-500' },
@@ -118,18 +120,18 @@ export default function CastleClient({
           <button
             key={key}
             onClick={() => setModal(key)}
-            className="bg-white rounded-xl border border-gray-200 p-4 text-center hover:border-purple-300 hover:bg-purple-50 hover:-translate-y-1 hover:shadow-md transition-all duration-200 active:scale-95"
+            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center hover:border-purple-300 hover:bg-purple-50 dark:hover:bg-gray-700 hover:-translate-y-1 hover:shadow-md transition-all duration-200 active:scale-95"
           >
-            <p className={`text-3xl font-bold ${color}`}>{count}</p>
-            <p className="text-xs text-gray-500 mt-1">{label}</p>
-            <p className="text-xs text-gray-300 mt-1">タップで一覧 ›</p>
+            <p className={`text-3xl font-bold ${color}`}><CountUp value={count} /></p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{label}</p>
+            <p className="text-xs text-gray-300 dark:text-gray-600 mt-1">タップで一覧 ›</p>
           </button>
         ))}
       </div>
 
       {/* ステージロードマップ（4段階を横並びで表示） */}
-      <div className="bg-white rounded-2xl border border-purple-100 p-5">
-        <p className="text-sm font-bold text-gray-700 mb-4">城の成長段階</p>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-purple-100 dark:border-gray-700 p-5">
+        <p className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-4">城の成長段階</p>
         <div className="flex items-center justify-between gap-1">
           {[...castleStages].reverse().map((s, i, arr) => {
             const isCurrent = s.name === stage.name
@@ -138,18 +140,18 @@ export default function CastleClient({
               <div key={s.name} className="flex items-center flex-1 min-w-0">
                 <div className="flex flex-col items-center flex-1 min-w-0">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-all
-                    ${isCurrent ? 'ring-4 ring-purple-400 bg-purple-50 scale-110' : isPast ? 'bg-amber-50' : 'bg-gray-100 opacity-40'}`}>
+                    ${isCurrent ? 'ring-4 ring-purple-400 bg-purple-50 dark:bg-purple-950 scale-110' : isPast ? 'bg-amber-50 dark:bg-amber-950' : 'bg-gray-100 dark:bg-gray-700 opacity-40'}`}>
                     {s.emoji}
                   </div>
                   <p className={`text-xs mt-1 text-center leading-tight truncate w-full
-                    ${isCurrent ? 'text-purple-600 font-bold' : isPast ? 'text-amber-600' : 'text-gray-400'}`}>
+                    ${isCurrent ? 'text-purple-600 font-bold' : isPast ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400 dark:text-gray-500'}`}>
                     {s.name}
                   </p>
-                  <p className="text-xs text-gray-300">{s.minRate}%〜</p>
+                  <p className="text-xs text-gray-300 dark:text-gray-600">{s.minRate}%〜</p>
                 </div>
                 {i < arr.length - 1 && (
                   <div className={`h-0.5 w-4 shrink-0 mx-1 rounded-full
-                    ${isPast ? 'bg-amber-400' : 'bg-gray-200'}`} />
+                    ${isPast ? 'bg-amber-400' : 'bg-gray-200 dark:bg-gray-700'}`} />
                 )}
               </div>
             )
@@ -158,8 +160,8 @@ export default function CastleClient({
       </div>
 
       {total === 0 && (
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 text-center text-gray-400 text-sm">
-          積みゲーを登録すると、城が育ち始めます
+        <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-6">
+          <EmptyState message="積みゲーを登録すると、城が育ち始めます" />
         </div>
       )}
 
@@ -174,11 +176,11 @@ export default function CastleClient({
             onClick={e => e.stopPropagation()}
           >
             {/* モーダルヘッダー */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/40">
-              <p className="font-bold text-gray-800">{modalTitle}（{modalGames.length}本）</p>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/40 dark:border-gray-600/40">
+              <p className="font-bold text-gray-800 dark:text-gray-100">{modalTitle}（{modalGames.length}本）</p>
               <button
                 onClick={() => setModal(null)}
-                className="text-gray-400 hover:text-gray-600 text-xl leading-none"
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none"
               >
                 ✕
               </button>
@@ -187,23 +189,23 @@ export default function CastleClient({
             {/* ゲーム一覧 */}
             <div className="overflow-y-auto flex-1 p-4 space-y-2">
               {modalGames.length === 0 ? (
-                <p className="text-center text-gray-400 py-8 text-sm">該当するゲームがありません</p>
+                <p className="text-center text-gray-400 dark:text-gray-500 py-8 text-sm">該当するゲームがありません</p>
               ) : (
                 modalGames.map(game => (
                   <Link
                     key={game.id}
                     href={`/games/${game.id}`}
                     onClick={() => setModal(null)}
-                    className="flex items-center gap-3 bg-gray-50 rounded-xl p-3 hover:bg-purple-50 transition-colors"
+                    className="flex items-center gap-3 bg-gray-50 dark:bg-gray-700/60 rounded-xl p-3 hover:bg-purple-50 dark:hover:bg-purple-950 transition-colors"
                   >
-                    <div className="w-9 h-9 shrink-0 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-sm">
+                    <div className="w-9 h-9 shrink-0 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-300 flex items-center justify-center font-bold text-sm">
                       {game.title.charAt(0)}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900 truncate">{game.title}</p>
-                      <p className="text-xs text-gray-400">{game.genre ?? '未設定'} ・ {game.platform ?? '未設定'}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{game.title}</p>
+                      <p className="text-xs text-gray-400 dark:text-gray-500">{game.genre ?? '未設定'} ・ {game.platform ?? '未設定'}</p>
                     </div>
-                    <span className="shrink-0 text-xs text-gray-400">{game.status}</span>
+                    <span className="shrink-0 text-xs text-gray-400 dark:text-gray-500">{game.status}</span>
                   </Link>
                 ))
               )}

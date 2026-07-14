@@ -7,6 +7,7 @@ import ChatPanel from '@/components/ChatPanel'
 import ListSheet from '@/components/sheets/ListSheet'
 import CastleSheet from '@/components/sheets/CastleSheet'
 import ProfileSheet from '@/components/sheets/ProfileSheet'
+import ThemeToggle from '@/components/ThemeToggle'
 
 type SheetId = 'list' | 'chat' | 'castle' | 'profile'
 
@@ -30,7 +31,7 @@ export default function AppNav() {
   return (
     <>
       {/* スマホ用ボトムタブ */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 flex z-10">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex z-10">
         {NAV_ITEMS.map(item => {
           const active = activeSheet === item.sheet && item.sheet !== null
             || (item.sheet === null && (item.href === '/' ? pathname === '/' : pathname.startsWith(item.href)))
@@ -43,7 +44,7 @@ export default function AppNav() {
                 href={item.href}
                 onClick={() => setActiveSheet(null)}
                 className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-xs ${
-                  active ? 'text-purple-600' : 'text-gray-400'
+                  active ? 'text-purple-600' : 'text-gray-400 dark:text-gray-500'
                 }`}
               >
                 <span className="text-lg">{item.icon}</span>
@@ -58,7 +59,7 @@ export default function AppNav() {
               key={item.href}
               onClick={() => toggleSheet(item.sheet!)}
               className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-xs ${
-                active ? 'text-purple-600' : 'text-gray-400'
+                active ? 'text-purple-600' : 'text-gray-400 dark:text-gray-500'
               }`}
             >
               <span className="text-lg">{item.icon}</span>
@@ -78,14 +79,14 @@ export default function AppNav() {
 
       {/* ボトムシート：パネル本体 */}
       <div
-        className={`md:hidden fixed bottom-0 inset-x-0 bg-white rounded-t-2xl z-30 flex flex-col transition-transform duration-300 ease-in-out ${
+        className={`md:hidden fixed bottom-0 inset-x-0 bg-white dark:bg-gray-800 rounded-t-2xl z-30 flex flex-col transition-transform duration-300 ease-in-out ${
           activeSheet ? 'translate-y-0 pointer-events-auto' : 'translate-y-full pointer-events-none'
         }`}
         style={{ height: '75vh', paddingBottom: '4rem' /* ボトムタブ分の余白 */ }}
       >
         {/* ドラッグハンドル */}
         <div className="flex justify-center pt-3 pb-1 shrink-0">
-          <div className="w-10 h-1 rounded-full bg-gray-300" />
+          <div className="w-10 h-1 rounded-full bg-gray-300 dark:bg-gray-600" />
         </div>
         {/* 各シートのコンテンツ */}
         <div className="flex-1 overflow-hidden">
@@ -97,8 +98,8 @@ export default function AppNav() {
       </div>
 
       {/* PC用サイドバー */}
-      <aside className="hidden md:flex md:flex-col md:w-[200px] md:shrink-0 border-r border-gray-200 bg-white min-h-screen">
-        <div className="px-4 py-4 border-b border-gray-200">
+      <aside className="hidden md:flex md:flex-col md:w-[200px] md:shrink-0 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 min-h-screen">
+        <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-700">
           <Link href="/" className="font-bold text-purple-600 text-sm hover:opacity-70 transition-opacity">
             積みゲー・コンシェルジュ
           </Link>
@@ -114,7 +115,7 @@ export default function AppNav() {
                   key={item.href}
                   onClick={() => setDrawerOpen(true)}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm w-full text-left ${
-                    drawerOpen ? 'bg-purple-50 text-purple-600 font-medium' : 'text-gray-600 hover:bg-gray-50'
+                    drawerOpen ? 'bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-300 font-medium' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                   }`}
                 >
                   <span>{item.icon}</span>
@@ -128,7 +129,7 @@ export default function AppNav() {
                 key={item.href}
                 href={item.href}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
-                  active ? 'bg-purple-50 text-purple-600 font-medium' : 'text-gray-600 hover:bg-gray-50'
+                  active ? 'bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-300 font-medium' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 }`}
               >
                 <span>{item.icon}</span>
@@ -137,17 +138,18 @@ export default function AppNav() {
             )
           })}
         </nav>
-        {/* 設定リンク（サイドバー下部） */}
-        <div className="p-2 border-t border-gray-100">
+        {/* 設定リンク・テーマ切り替え（サイドバー下部） */}
+        <div className="p-2 border-t border-gray-100 dark:border-gray-700 space-y-1">
           <Link
             href="/settings"
             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
-              pathname === '/settings' ? 'bg-purple-50 text-purple-600 font-medium' : 'text-gray-500 hover:bg-gray-50'
+              pathname === '/settings' ? 'bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-300 font-medium' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
           >
             <span>⚙️</span>
             設定
           </Link>
+          <ThemeToggle />
         </div>
       </aside>
 
@@ -163,7 +165,7 @@ export default function AppNav() {
 
         {/* ドロワー本体 */}
         <div
-          className={`hidden md:flex flex-col fixed top-0 right-0 h-screen w-[300px] bg-white border-l border-gray-200 shadow-xl z-50 transition-transform duration-300 ease-in-out ${
+          className={`hidden md:flex flex-col fixed top-0 right-0 h-screen w-[300px] bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 shadow-xl z-50 transition-transform duration-300 ease-in-out ${
             drawerOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >

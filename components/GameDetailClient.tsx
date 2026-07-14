@@ -186,7 +186,7 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900 dark:text-gray-100">
       {/* クリア時のトースト通知 */}
       {toast && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-amber-500 text-white px-6 py-3 rounded-full shadow-lg text-sm font-bold animate-bounce">
@@ -202,10 +202,10 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
       )}
 
       {/* ヘッダー */}
-      <header className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3">
+      <header className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center gap-3">
         <button
           onClick={() => router.back()}
-          className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+          className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
         >
           ← 一つ前に戻る
         </button>
@@ -219,7 +219,7 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
         {editing ? (
           <form onSubmit={handleSave} className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-700 mb-1">
+              <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">
                 タイトル <span className="text-red-500">*</span>
               </label>
               <input
@@ -227,26 +227,26 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 required
-                className="w-full px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-purple-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 mb-1">ジャンル</label>
+              <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">ジャンル</label>
               <input
                 type="text"
                 value={genre}
                 onChange={e => setGenre(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-purple-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 mb-1">プラットフォーム</label>
+              <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">プラットフォーム</label>
               <select
                 value={platform}
                 onChange={e => setPlatform(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-purple-500"
               >
                 {PLATFORMS.map(p => (
                   <option key={p} value={p}>{p}</option>
@@ -255,11 +255,11 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 mb-1">ステータス</label>
+              <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">ステータス</label>
               <select
                 value={status}
                 onChange={e => setStatus(e.target.value as (typeof STATUSES)[number])}
-                className="w-full px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-purple-500"
               >
                 {STATUSES.map(s => (
                   <option key={s} value={s}>{s}</option>
@@ -268,22 +268,22 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 mb-1">購入日</label>
+              <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">購入日</label>
               <input
                 type="date"
                 value={purchaseDate}
                 onChange={e => setPurchaseDate(e.target.value)}
-                className="w-full px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-purple-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 mb-1">進捗メモ</label>
+              <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">進捗メモ</label>
               <textarea
                 value={progressNote}
                 onChange={e => setProgressNote(e.target.value)}
                 rows={3}
-                className="w-full px-4 py-2 rounded-lg bg-white text-gray-900 border border-gray-300 focus:outline-none focus:border-purple-500"
+                className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-purple-500"
               />
             </div>
 
@@ -293,7 +293,7 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
               <button
                 type="button"
                 onClick={handleCancel}
-                className="flex-1 py-3 rounded-lg border border-gray-300 text-gray-600 font-medium hover:bg-gray-50 transition-colors"
+                className="flex-1 py-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
                 キャンセル
               </button>
@@ -309,7 +309,7 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
         ) : (
           <div className="space-y-4">
             {/* カバー画像 */}
-            <div className="relative w-full h-40 rounded-xl overflow-hidden bg-purple-100 flex items-center justify-center">
+            <div className="relative w-full h-40 rounded-xl overflow-hidden bg-purple-100 dark:bg-purple-950 flex items-center justify-center">
               {coverImageUrl ? (
                 <Image
                   src={coverImageUrl}
@@ -319,7 +319,7 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
                   unoptimized={coverImageUrl.startsWith('/')}
                 />
               ) : (
-                <span className="text-5xl text-purple-300">{game.title.charAt(0)}</span>
+                <span className="text-5xl text-purple-300 dark:text-purple-700">{game.title.charAt(0)}</span>
               )}
               {/* 画像変更ボタン（右下に重ねる） */}
               <label className="absolute bottom-2 right-2 px-2 py-1 bg-black/50 text-white text-xs rounded-lg cursor-pointer hover:bg-black/70 transition-colors">
@@ -335,34 +335,34 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
             </div>
 
             <div>
-              <p className="text-sm text-gray-500">タイトル</p>
-              <p className="text-gray-900 font-medium">{game.title}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">タイトル</p>
+              <p className="text-gray-900 dark:text-gray-100 font-medium">{game.title}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">ジャンル</p>
-              <p className="text-gray-900">{game.genre || '未設定'}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">ジャンル</p>
+              <p className="text-gray-900 dark:text-gray-100">{game.genre || '未設定'}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">プラットフォーム</p>
-              <p className="text-gray-900">{game.platform || '未設定'}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">プラットフォーム</p>
+              <p className="text-gray-900 dark:text-gray-100">{game.platform || '未設定'}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">ステータス</p>
-              <p className="text-gray-900">{game.status}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">ステータス</p>
+              <p className="text-gray-900 dark:text-gray-100">{game.status}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">購入日</p>
-              <p className="text-gray-900">{game.purchaseDate || '未設定'}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">購入日</p>
+              <p className="text-gray-900 dark:text-gray-100">{game.purchaseDate || '未設定'}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">進捗メモ</p>
-              <p className="text-gray-900 whitespace-pre-wrap">{game.progressNote || '未設定'}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">進捗メモ</p>
+              <p className="text-gray-900 dark:text-gray-100 whitespace-pre-wrap">{game.progressNote || '未設定'}</p>
             </div>
 
             {/* AIあらすじ */}
-            <div className="bg-green-50 rounded-xl p-4">
+            <div className="bg-green-50 dark:bg-green-950 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-bold text-green-600">📖 どんなゲーム？</p>
+                <p className="text-sm font-bold text-green-600 dark:text-green-400">📖 どんなゲーム？</p>
                 {synopsis && (
                   <button
                     onClick={handleFetchSynopsis}
@@ -374,17 +374,17 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
                 )}
               </div>
               {synopsis ? (
-                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{synopsis}</p>
+                <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">{synopsis}</p>
               ) : synopsisLoading ? (
                 <div className="animate-pulse space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-full" />
-                  <div className="h-4 bg-gray-200 rounded w-full" />
-                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
                 </div>
               ) : (
                 <button
                   onClick={handleFetchSynopsis}
-                  className="w-full py-2 rounded-lg border border-green-200 text-sm text-green-600 font-medium hover:bg-green-100 transition-colors"
+                  className="w-full py-2 rounded-lg border border-green-200 dark:border-green-800 text-sm text-green-600 dark:text-green-400 font-medium hover:bg-green-100 dark:hover:bg-green-900 transition-colors"
                 >
                   どんなゲームかAIに聞く
                 </button>
@@ -392,9 +392,9 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
             </div>
 
             {/* AIモチベーター */}
-            <div className="bg-purple-50 rounded-xl p-4">
+            <div className="bg-purple-50 dark:bg-purple-950 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-bold text-purple-600">✨ AIコンシェルジュより</p>
+                <p className="text-sm font-bold text-purple-600 dark:text-purple-400">✨ AIコンシェルジュより</p>
                 {motivator && (
                   <button
                     onClick={handleFetchMotivator}
@@ -406,17 +406,17 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
                 )}
               </div>
               {motivator ? (
-                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{motivator}</p>
+                <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">{motivator}</p>
               ) : motivatorLoading ? (
                 <div className="animate-pulse space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-full" />
-                  <div className="h-4 bg-gray-200 rounded w-full" />
-                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
                 </div>
               ) : (
                 <button
                   onClick={handleFetchMotivator}
-                  className="w-full py-2 rounded-lg border border-purple-200 text-sm text-purple-600 font-medium hover:bg-purple-100 transition-colors"
+                  className="w-full py-2 rounded-lg border border-purple-200 dark:border-purple-800 text-sm text-purple-600 dark:text-purple-400 font-medium hover:bg-purple-100 dark:hover:bg-purple-900 transition-colors"
                 >
                   「ここが面白い！」をAIに聞く
                 </button>
@@ -424,9 +424,9 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
             </div>
 
             {/* AI操作ガイド */}
-            <div className="bg-blue-50 rounded-xl p-4">
+            <div className="bg-blue-50 dark:bg-blue-950 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-bold text-blue-600">🎮 始め方・操作ガイド</p>
+                <p className="text-sm font-bold text-blue-600 dark:text-blue-400">🎮 始め方・操作ガイド</p>
                 {controlGuide && (
                   <button
                     onClick={handleFetchControlGuide}
@@ -438,17 +438,17 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
                 )}
               </div>
               {controlGuide ? (
-                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">{controlGuide}</p>
+                <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">{controlGuide}</p>
               ) : controlGuideLoading ? (
                 <div className="animate-pulse space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-full" />
-                  <div className="h-4 bg-gray-200 rounded w-full" />
-                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
                 </div>
               ) : (
                 <button
                   onClick={handleFetchControlGuide}
-                  className="w-full py-2 rounded-lg border border-blue-200 text-sm text-blue-600 font-medium hover:bg-blue-100 transition-colors"
+                  className="w-full py-2 rounded-lg border border-blue-200 dark:border-blue-800 text-sm text-blue-600 dark:text-blue-400 font-medium hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors"
                 >
                   始め方・操作方法をAIに聞く
                 </button>
@@ -485,14 +485,14 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
         {/* 削除確認モーダル */}
         {confirmingDelete && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center px-4">
-            <div className="bg-white rounded-lg p-6 max-w-sm w-full">
-              <p className="text-gray-900 mb-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full">
+              <p className="text-gray-900 dark:text-gray-100 mb-6">
                 本当に削除しますか？この操作は取り消せません。
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setConfirmingDelete(false)}
-                  className="flex-1 py-2 rounded-lg border border-gray-300 text-gray-600 font-medium hover:bg-gray-50 transition-colors"
+                  className="flex-1 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
                   キャンセル
                 </button>
