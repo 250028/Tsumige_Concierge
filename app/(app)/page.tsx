@@ -85,9 +85,9 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* 今日の1本 */}
-      <div className="px-4 pt-6">
-        <p className="text-xs font-bold text-gray-500 tracking-wide mb-2">🎯 今日の1本</p>
+      {/* 今日の1本：フルブリードの紫グラデーションセクション */}
+      <div className="bg-gradient-to-br from-purple-600 to-purple-900 px-4 py-6 mt-4">
+        <p className="text-xs font-bold text-white/80 tracking-wide mb-2">🎯 今日の1本</p>
         {heroGame ? (
           <RecommendCard
             gameId={heroGame.id}
@@ -95,7 +95,7 @@ export default async function Home() {
             initialReason={recommendReason}
           />
         ) : (
-          <div className="bg-white rounded-2xl border border-gray-200 p-4 text-center text-gray-400">
+          <div className="bg-white/10 rounded-2xl border border-white/20 p-4 text-center text-white/70">
             積みゲーを登録すると、ここにおすすめが表示されます
           </div>
         )}
