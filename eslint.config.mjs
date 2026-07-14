@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Jestの設定ファイルはCommonJS前提（next/jestの公式パターン）のためlint対象から除外
+    "jest.config.js",
   ]),
 ]);
 
