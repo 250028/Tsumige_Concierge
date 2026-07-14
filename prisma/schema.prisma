@@ -82,6 +82,7 @@ model Game {
   totalPlayTime     Int         @default(0)  // 単位: 分（play_sessions と同期必須）
   lastPlayedAt      DateTime?
   clearedAt         DateTime?   // クリア済みにした日時（今月クリア N本の集計用）
+  pointsGrantedAt   DateTime?   // 初回クリア時のポイント付与日時（一度付与したら再クリアしても付与しない）
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
 
