@@ -38,6 +38,14 @@ enum ChatRole {
   assistant  // AI返答
 }
 
+// 通知の種類
+enum NotificationType {
+  neglected       // 長期未プレイのリマインド
+  streakWarning   // 連続プレイ記録が途切れそう
+  achievement     // 実績解除
+  points          // ポイント獲得
+}
+
 // =============================================================
 //  Model: User（ユーザー情報）
 // =============================================================
@@ -60,6 +68,7 @@ model User {
   chatLogs         ChatLog[]
   playSessions     PlaySession[]
   userAchievements UserAchievement[]
+  notifications    Notification[]
 
   @@map("users")
 }
@@ -87,8 +96,9 @@ model Game {
   updatedAt         DateTime    @updatedAt
 
   // リレーション
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  playSessions PlaySession[]
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playSessions  PlaySession[]
+  notifications Notification[]
 
   @@index([status])        // リスト画面のフィルターチップ用
   @@index([clearedAt])     // 今月クリア N本の集計用
@@ -165,4 +175,25 @@ model UserAchievement {
   // 1ユーザー1実績1回のみ取得可能
   @@unique([userId, achievementId])
   @@map("user_achievements")
+}
+
+// =============================================================
+//  Model: Notification（自動通知）
+// =============================================================
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  type      NotificationType
+  message   String           @db.VarChar(255)
+  gameId    Int?             // 関連ゲームがあれば紐付け（無ければ NULL）
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  // リレーション
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game? @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])                // 未読件数の取得用
+  @@index([userId, gameId, type, createdAt]) // 重複生成防止のチェック用
+  @@map("notifications")
 }

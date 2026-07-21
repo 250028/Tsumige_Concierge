@@ -5,6 +5,7 @@ import { GameStatus } from '@prisma/client'
 import prisma from '@/lib/prisma'
 import { sessionOptions, SessionData } from '@/lib/session'
 import { checkAndGrantAchievements } from '@/lib/achievements'
+import { notifyAchievements, notifyPoints } from '@/lib/notifications'
 
 function isValidStatus(value: unknown): value is GameStatus {
   return typeof value === 'string' && Object.values(GameStatus).includes(value as GameStatus)
@@ -104,6 +105,13 @@ export async function PUT(req: NextRequest, { params }: Params) {
     const newAchievements = justCleared
       ? await checkAndGrantAchievements(session.userId)
       : []
+
+    if (justCleared) {
+      await notifyPoints(session.userId, updated.id, updated.title, 100)
+    }
+    if (newAchievements.length > 0) {
+      await notifyAchievements(session.userId, newAchievements)
+    }
 
     return NextResponse.json({
       ...updated,
