@@ -15,9 +15,10 @@ export async function GET(req: Request) {
   if (!query) {
     return NextResponse.json({ error: '検索ワードを入力してください' }, { status: 400 })
   }
+  const limit = Number(searchParams.get('limit')) || 5
 
   try {
-    const games = await searchGames(query)
+    const games = await searchGames(query, limit)
     return NextResponse.json({ games })
   } catch (e) {
     console.error('RAWG API エラー:', e)

@@ -75,8 +75,8 @@ export async function getGameDescription(rawgId: number): Promise<string | null>
   }
 }
 
-// ゲームタイトルで検索して上位5件を返す
-export async function searchGames(query: string): Promise<RawgGame[]> {
+// ゲームタイトルで検索して上位pageSize件を返す（デフォルト5件、最大20件）
+export async function searchGames(query: string, pageSize = 5): Promise<RawgGame[]> {
   const apiKey = process.env.RAWG_API_KEY
   if (!apiKey) throw new Error('RAWG_API_KEY が設定されていません')
 
@@ -87,7 +87,8 @@ export async function searchGames(query: string): Promise<RawgGame[]> {
     if (translated) searchQuery = translated
   }
 
-  const url = `https://api.rawg.io/api/games?search=${encodeURIComponent(searchQuery)}&page_size=5&key=${apiKey}`
+  const clampedPageSize = Math.min(Math.max(pageSize, 1), 20)
+  const url = `https://api.rawg.io/api/games?search=${encodeURIComponent(searchQuery)}&page_size=${clampedPageSize}&key=${apiKey}`
   const res = await fetch(url, { next: { revalidate: 3600 } })
 
   if (!res.ok) throw new Error(`RAWG API エラー: ${res.status}`)
