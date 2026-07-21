@@ -154,12 +154,12 @@ export default function SettingsForm({ loginId, email: initialEmail, notificatio
           <button
             onClick={handleNotifToggle}
             disabled={savingNotif}
-            className={`relative w-12 h-6 shrink-0 rounded-full transition-colors duration-200 ${
+            className={`relative w-10 h-5 shrink-0 rounded-full transition-colors duration-200 ${
               notif ? 'bg-purple-600' : 'bg-gray-300'
             } disabled:opacity-50`}
           >
-            <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${
-              notif ? 'translate-x-6' : 'translate-x-0'
+            <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 ${
+              notif ? 'translate-x-5' : 'translate-x-0'
             }`} />
           </button>
         </div>
