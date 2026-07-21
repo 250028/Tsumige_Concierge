@@ -3,6 +3,7 @@ import { getIronSession } from 'iron-session'
 import { sessionOptions, SessionData } from '@/lib/session'
 import AppNav from '@/components/AppNav'
 import LogoutButton from '@/components/LogoutButton'
+import NotificationBell from '@/components/NotificationBell'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
@@ -15,7 +16,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         {/* 共通ヘッダー */}
         <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between">
           <span className="text-sm text-gray-600 dark:text-gray-300">{session.userName} さん　こんにちは！</span>
-          <LogoutButton />
+          <div className="flex items-center gap-2">
+            <NotificationBell />
+            <LogoutButton />
+          </div>
         </header>
 
         {/* スマホはボトムタブの高さ分だけ下に余白を確保 */}
