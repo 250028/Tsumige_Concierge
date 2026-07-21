@@ -219,10 +219,11 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
         {editing ? (
           <form onSubmit={handleSave} className="space-y-4">
             <div>
-              <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">
+              <label htmlFor="game-title" className="block text-sm text-gray-700 dark:text-gray-200 mb-1">
                 タイトル <span className="text-red-500">*</span>
               </label>
               <input
+                id="game-title"
                 type="text"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
@@ -232,8 +233,9 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">ジャンル</label>
+              <label htmlFor="game-genre" className="block text-sm text-gray-700 dark:text-gray-200 mb-1">ジャンル</label>
               <input
+                id="game-genre"
                 type="text"
                 value={genre}
                 onChange={e => setGenre(e.target.value)}
@@ -242,8 +244,9 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">プラットフォーム</label>
+              <label htmlFor="game-platform" className="block text-sm text-gray-700 dark:text-gray-200 mb-1">プラットフォーム</label>
               <select
+                id="game-platform"
                 value={platform}
                 onChange={e => setPlatform(e.target.value)}
                 className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-purple-500"
@@ -255,8 +258,9 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">ステータス</label>
+              <label htmlFor="game-status" className="block text-sm text-gray-700 dark:text-gray-200 mb-1">ステータス</label>
               <select
+                id="game-status"
                 value={status}
                 onChange={e => setStatus(e.target.value as (typeof STATUSES)[number])}
                 className="w-full px-4 py-2 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 focus:outline-none focus:border-purple-500"
@@ -268,8 +272,9 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">購入日</label>
+              <label htmlFor="game-purchase-date" className="block text-sm text-gray-700 dark:text-gray-200 mb-1">購入日</label>
               <input
+                id="game-purchase-date"
                 type="date"
                 value={purchaseDate}
                 onChange={e => setPurchaseDate(e.target.value)}
@@ -278,8 +283,9 @@ export default function GameDetailClient({ game, activeSessionId, activeSessionS
             </div>
 
             <div>
-              <label className="block text-sm text-gray-700 dark:text-gray-200 mb-1">進捗メモ</label>
+              <label htmlFor="game-progress-note" className="block text-sm text-gray-700 dark:text-gray-200 mb-1">進捗メモ</label>
               <textarea
+                id="game-progress-note"
                 value={progressNote}
                 onChange={e => setProgressNote(e.target.value)}
                 rows={3}

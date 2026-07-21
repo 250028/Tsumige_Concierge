@@ -124,8 +124,9 @@ export default function SettingsForm({ loginId, email: initialEmail, notificatio
         <p className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-4">メールアドレス変更</p>
         <form onSubmit={handleEmailChange} className="space-y-3">
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">メールアドレス</label>
+            <label htmlFor="settings-email" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">メールアドレス</label>
             <input
+              id="settings-email"
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
@@ -170,8 +171,9 @@ export default function SettingsForm({ loginId, email: initialEmail, notificatio
         <p className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-4">パスワード変更</p>
         <form onSubmit={handlePasswordChange} className="space-y-3">
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">現在のパスワード</label>
+            <label htmlFor="settings-current-password" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">現在のパスワード</label>
             <input
+              id="settings-current-password"
               type="password"
               value={currentPassword}
               onChange={e => setCurrentPassword(e.target.value)}
@@ -180,8 +182,9 @@ export default function SettingsForm({ loginId, email: initialEmail, notificatio
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">新しいパスワード（8文字以上）</label>
+            <label htmlFor="settings-new-password" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">新しいパスワード（8文字以上）</label>
             <input
+              id="settings-new-password"
               type="password"
               value={newPassword}
               onChange={e => setNewPassword(e.target.value)}
@@ -191,8 +194,9 @@ export default function SettingsForm({ loginId, email: initialEmail, notificatio
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">新しいパスワード（確認）</label>
+            <label htmlFor="settings-confirm-password" className="block text-xs text-gray-500 dark:text-gray-400 mb-1">新しいパスワード（確認）</label>
             <input
+              id="settings-confirm-password"
               type="password"
               value={confirmPassword}
               onChange={e => setConfirmPassword(e.target.value)}
