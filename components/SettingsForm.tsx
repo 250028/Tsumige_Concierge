@@ -4,11 +4,14 @@ import { useState } from 'react'
 
 type Props = {
   loginId: string
+  email: string
   notificationEnabled: boolean
 }
 
-export default function SettingsForm({ loginId, notificationEnabled: initialNotif }: Props) {
+export default function SettingsForm({ loginId, email: initialEmail, notificationEnabled: initialNotif }: Props) {
   const [notif, setNotif] = useState(initialNotif)
+  const [email, setEmail] = useState(initialEmail)
+  const [savingEmail, setSavingEmail] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -39,6 +42,30 @@ export default function SettingsForm({ loginId, notificationEnabled: initialNoti
       showMessage('通知設定の保存に失敗しました', true)
     } finally {
       setSavingNotif(false)
+    }
+  }
+
+  // メールアドレス変更
+  async function handleEmailChange(e: React.FormEvent) {
+    e.preventDefault()
+    setSavingEmail(true)
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        showMessage(data.error, true)
+      } else {
+        setEmail(data.email)
+        showMessage('メールアドレスを変更しました')
+      }
+    } catch {
+      showMessage('通信エラーが発生しました', true)
+    } finally {
+      setSavingEmail(false)
     }
   }
 
@@ -90,6 +117,30 @@ export default function SettingsForm({ loginId, notificationEnabled: initialNoti
           <p className="text-gray-500 dark:text-gray-400 mb-1">ログインID</p>
           <p className="font-medium text-gray-800 dark:text-gray-100">{loginId}</p>
         </div>
+      </div>
+
+      {/* メールアドレス変更 */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-5">
+        <p className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-4">メールアドレス変更</p>
+        <form onSubmit={handleEmailChange} className="space-y-3">
+          <div>
+            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">メールアドレス</label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={savingEmail || email === initialEmail || !email.trim()}
+            className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
+          >
+            {savingEmail ? '変更中…' : 'メールアドレスを変更する'}
+          </button>
+        </form>
       </div>
 
       {/* 通知設定 */}
