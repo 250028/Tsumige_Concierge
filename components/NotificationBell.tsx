@@ -34,11 +34,10 @@ export default function NotificationBell() {
   const [open, setOpen] = useState(false)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const containerRef = useRef<HTMLDivElement>(null)
 
   async function fetchNotifications() {
-    setLoading(true)
     try {
       const res = await fetch('/api/notifications')
       const data = await res.json()
