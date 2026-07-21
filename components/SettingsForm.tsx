@@ -154,7 +154,7 @@ export default function SettingsForm({ loginId, email: initialEmail, notificatio
           <button
             onClick={handleNotifToggle}
             disabled={savingNotif}
-            className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${
+            className={`relative w-12 h-6 shrink-0 rounded-full transition-colors duration-200 ${
               notif ? 'bg-purple-600' : 'bg-gray-300'
             } disabled:opacity-50`}
           >
