@@ -95,4 +95,57 @@ describe('checkAndGrantAchievements', () => {
     expect(result).toEqual([])
     expect(mockedPrisma.userAchievement.create).not.toHaveBeenCalled()
   })
+
+  it('5本・10本クリアで「5本クリア」と「10本クリア」が同時に新規付与される', async () => {
+    // first_clear は取得済みとして除外し、5本・10本の判定だけを見る
+    mockedPrisma.userAchievement.findMany.mockResolvedValue([
+      { achievement: { conditionKey: 'first_clear' } },
+    ])
+    // クリア10本・総数20本 → 消化率50%なので城王(80%以上)・コンプリート(全クリア)は成立しない
+    mockGameCounts(10, 20)
+    mockedPrisma.playSession.findMany.mockResolvedValue([])
+
+    const result = await checkAndGrantAchievements(1)
+
+    expect(result).toEqual(['📚 5本クリア', '🎯 10本クリア'])
+  })
+
+  it('消化率80%以上で「積みゲー城王」が新規付与される', async () => {
+    // first_clear は取得済みとして除外
+    mockedPrisma.userAchievement.findMany.mockResolvedValue([
+      { achievement: { conditionKey: 'first_clear' } },
+    ])
+    // クリア4本・総数5本 → 消化率80%ちょうど。5本未満なので five_clears は成立しない
+    mockGameCounts(4, 5)
+    mockedPrisma.playSession.findMany.mockResolvedValue([])
+
+    const result = await checkAndGrantAchievements(1)
+
+    expect(result).toEqual(['👑 積みゲー城王'])
+  })
+
+  it('全ゲームクリアで「コンプリート」が新規付与される', async () => {
+    // first_clear と castle_king(全クリアなら消化率100%で同時に条件を満たすため)は取得済みとして除外
+    mockedPrisma.userAchievement.findMany.mockResolvedValue([
+      { achievement: { conditionKey: 'first_clear' } },
+      { achievement: { conditionKey: 'castle_king' } },
+    ])
+    // クリア3本・総数3本 → 全クリア。5本未満なので five_clears は成立しない
+    mockGameCounts(3, 3)
+    mockedPrisma.playSession.findMany.mockResolvedValue([])
+
+    const result = await checkAndGrantAchievements(1)
+
+    expect(result).toEqual(['🏆 コンプリート'])
+  })
+
+  it('ゲームが0件のときは消化率系の実績(城王・コンプリート)が付与されない', async () => {
+    mockedPrisma.userAchievement.findMany.mockResolvedValue([])
+    mockGameCounts(0, 0) // 総数0本 → ゼロ除算を避けるガードが効くはず
+    mockedPrisma.playSession.findMany.mockResolvedValue([])
+
+    const result = await checkAndGrantAchievements(1)
+
+    expect(result).toEqual([])
+  })
 })
