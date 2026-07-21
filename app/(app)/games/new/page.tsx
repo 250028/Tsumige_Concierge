@@ -22,6 +22,7 @@ export default function NewGamePage() {
   // RAWG検索用state
   const [searchResults, setSearchResults] = useState<RawgGame[]>([])
   const [searching, setSearching]         = useState(false)
+  const [expanded, setExpanded]           = useState(false)
   const [coverImageUrl, setCoverImageUrl] = useState<string | null>(null)
   const [rawgId, setRawgId]               = useState<number | null>(null)
 
@@ -53,10 +54,26 @@ export default function NewGamePage() {
     if (!title.trim()) return
     setSearching(true)
     setSearchResults([])
+    setExpanded(false)
     try {
       const res = await fetch(`/api/rawg/search?q=${encodeURIComponent(title)}`)
       const data = await res.json()
       setSearchResults(data.games ?? [])
+    } catch {
+      setError('ゲームの検索に失敗しました')
+    } finally {
+      setSearching(false)
+    }
+  }
+
+  // 「他の候補を見る」で最大20件まで再検索
+  async function handleShowMore() {
+    setSearching(true)
+    try {
+      const res = await fetch(`/api/rawg/search?q=${encodeURIComponent(title)}&limit=20`)
+      const data = await res.json()
+      setSearchResults(data.games ?? [])
+      setExpanded(true)
     } catch {
       setError('ゲームの検索に失敗しました')
     } finally {
@@ -166,16 +183,33 @@ export default function NewGamePage() {
                     </button>
                   </li>
                 ))}
+                {!expanded && searchResults.length >= 5 && (
+                  <li>
+                    <button
+                      type="button"
+                      onClick={handleShowMore}
+                      disabled={searching}
+                      className="w-full px-3 py-2 bg-white dark:bg-gray-800 text-xs text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950 disabled:opacity-40 transition-colors text-center"
+                    >
+                      {searching ? '検索中…' : '他の候補を見る'}
+                    </button>
+                  </li>
+                )}
                 <li>
                   <button
                     type="button"
-                    onClick={() => setSearchResults([])}
+                    onClick={() => { setSearchResults([]); setExpanded(false) }}
                     className="w-full px-3 py-2 bg-white dark:bg-gray-800 text-xs text-gray-400 dark:text-gray-500 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-center"
                   >
                     候補を閉じる
                   </button>
                 </li>
               </ul>
+            )}
+            {expanded && searchResults.length >= 20 && (
+              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+                候補が多いため一部のみ表示しています。タイトルをもっと絞り込んでください。
+              </p>
             )}
 
             {/* 選択済みカバー画像プレビュー */}
