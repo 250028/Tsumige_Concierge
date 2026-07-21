@@ -11,7 +11,7 @@ export default async function SettingsPage() {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { loginId: true, name: true, notificationEnabled: true },
+    select: { loginId: true, name: true, email: true, notificationEnabled: true },
   })
 
   if (!user) return null
@@ -31,6 +31,7 @@ export default async function SettingsPage() {
 
         <SettingsForm
           loginId={user.loginId}
+          email={user.email}
           notificationEnabled={user.notificationEnabled}
         />
       </div>

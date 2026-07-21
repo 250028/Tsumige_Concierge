@@ -5,19 +5,34 @@ import bcrypt from 'bcryptjs'
 import prisma from '@/lib/prisma'
 import { sessionOptions, SessionData } from '@/lib/session'
 
-// 通知設定の更新
+// 通知設定・メールアドレスの更新
 export async function PATCH(req: Request) {
   const session = await getIronSession<SessionData>(await cookies(), sessionOptions)
   if (!session.userId) {
     return NextResponse.json({ error: '未ログインです' }, { status: 401 })
   }
 
-  const { notificationEnabled } = await req.json()
+  const { notificationEnabled, email } = await req.json()
+
+  if (email !== undefined) {
+    if (typeof email !== 'string' || !email.trim()) {
+      return NextResponse.json({ error: 'メールアドレスを入力してください' }, { status: 400 })
+    }
+
+    // メールアドレスの重複チェック（自分自身は除く）
+    const existing = await prisma.user.findUnique({ where: { email: email.trim() } })
+    if (existing && existing.id !== session.userId) {
+      return NextResponse.json({ error: 'このメールアドレスはすでに使われています' }, { status: 409 })
+    }
+  }
 
   const updated = await prisma.user.update({
     where: { id: session.userId },
-    data: { notificationEnabled: Boolean(notificationEnabled) },
-    select: { notificationEnabled: true },
+    data: {
+      ...(notificationEnabled !== undefined ? { notificationEnabled: Boolean(notificationEnabled) } : {}),
+      ...(email !== undefined ? { email: email.trim() } : {}),
+    },
+    select: { notificationEnabled: true, email: true },
   })
 
   return NextResponse.json(updated)
