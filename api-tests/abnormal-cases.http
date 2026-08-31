@@ -1,0 +1,226 @@
+### 積みゲー・コンシェルジュ APIテスト（異常系メイン）
+### 使い方: VS Code + REST Client拡張機能で、各リクエスト上に出る「Send Request」をクリックする
+### 認証: ログインのレスポンスで発行されるCookieを、REST Clientが自動でこのファイル内の後続リクエストに引き継ぐ
+### 参照: ../docs/interface_design.md（各APIの仕様）
+
+@baseUrl = http://localhost:3000
+
+###############################################
+# 0. 前提：ログイン（正常系。以降のリクエストのCookieを取得するため）
+###############################################
+
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "loginId": "yurika",
+  "password": "test111"
+}
+
+###############################################
+# 1. 認証系の異常系
+###############################################
+
+### 1-1. ログイン：パスワード誤り → 401
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "loginId": "yurika",
+  "password": "wrongpassword"
+}
+
+### 1-2. ログイン：未入力 → 400
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "loginId": "",
+  "password": ""
+}
+
+### 1-3. 新規登録：ログインID重複（既存のyurika） → 409
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "loginId": "yurika",
+  "name": "テスト太郎",
+  "email": "new-unique@example.com",
+  "password": "password123"
+}
+
+### 1-4. 新規登録：パスワードが短い（6文字未満） → 400
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "loginId": "newuser999",
+  "name": "テスト太郎",
+  "email": "newuser999@example.com",
+  "password": "abc"
+}
+
+### 1-5. 新規登録：ログインIDが短い（3文字未満） → 400
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "loginId": "ab",
+  "name": "テスト太郎",
+  "email": "ab999@example.com",
+  "password": "password123"
+}
+
+###############################################
+# 2. 積みゲーCRUDの異常系
+###############################################
+
+### 2-1. 登録：タイトル未入力 → 400
+POST {{baseUrl}}/api/games
+Content-Type: application/json
+
+{
+  "genre": "RPG"
+}
+
+### 2-2. 詳細取得：存在しないID → 404
+GET {{baseUrl}}/api/games/999999
+
+### 2-3. 更新：存在しないID → 404
+PUT {{baseUrl}}/api/games/999999
+Content-Type: application/json
+
+{
+  "title": "存在しないゲーム"
+}
+
+### 2-4. 削除：存在しないID → 404
+DELETE {{baseUrl}}/api/games/999999
+
+###############################################
+# 3. プレイセッションの異常系
+###############################################
+
+### 3-1. 開始：gameId未指定 → 400
+POST {{baseUrl}}/api/play-session
+Content-Type: application/json
+
+{}
+
+### 3-2. 開始：存在しないgameId → 404
+POST {{baseUrl}}/api/play-session
+Content-Type: application/json
+
+{
+  "gameId": 999999
+}
+
+### 3-3. 停止：存在しないセッションID → 404
+PATCH {{baseUrl}}/api/play-session/999999
+Content-Type: application/json
+
+{}
+
+### 3-4. （準備）実在ゲームでセッション開始 → 後続で停止2回テストに使う
+# @name startSession
+POST {{baseUrl}}/api/play-session
+Content-Type: application/json
+
+{
+  "gameId": 8
+}
+
+### 3-5. 停止1回目（正常系） → 200
+PATCH {{baseUrl}}/api/play-session/{{startSession.response.body.$.id}}
+Content-Type: application/json
+
+{}
+
+### 3-6. 停止2回目（既に停止済み） → 400
+PATCH {{baseUrl}}/api/play-session/{{startSession.response.body.$.id}}
+Content-Type: application/json
+
+{}
+
+###############################################
+# 4. 通知の異常系
+###############################################
+
+### 4-1. 個別既読化：存在しない通知ID → 404
+PATCH {{baseUrl}}/api/notifications/999999
+
+###############################################
+# 5. 設定・パスワード変更の異常系
+###############################################
+
+### 5-1. メールアドレス変更：空文字 → 400
+PATCH {{baseUrl}}/api/settings
+Content-Type: application/json
+
+{
+  "email": ""
+}
+
+### 5-2. パスワード変更：現在のパスワードが間違っている → 400
+PUT {{baseUrl}}/api/settings
+Content-Type: application/json
+
+{
+  "currentPassword": "wrongcurrentpassword",
+  "newPassword": "newpassword123"
+}
+
+### 5-3. パスワード変更：新パスワードが短い（8文字未満） → 400
+PUT {{baseUrl}}/api/settings
+Content-Type: application/json
+
+{
+  "currentPassword": "test111",
+  "newPassword": "short1"
+}
+
+###############################################
+# 6. RAWG検索の異常系
+###############################################
+
+### 6-1. 検索ワード未入力 → 400
+GET {{baseUrl}}/api/rawg/search
+
+###############################################
+# 7. ゲーム詳細AI機能：存在しないゲームID（Gemini呼び出し前に404で弾かれるはず）
+###############################################
+
+### 7-1. あらすじ生成：存在しないID → 404（Gemini課金は発生しない）
+GET {{baseUrl}}/api/games/999999/synopsis
+
+### 7-2. モチベーター生成：存在しないID → 404
+GET {{baseUrl}}/api/games/999999/motivator
+
+### 7-3. 操作ガイド生成：存在しないID → 404
+GET {{baseUrl}}/api/games/999999/control-guide
+
+###############################################
+# 8. 未ログイン状態での各種アクセス → すべて401になるはず
+###############################################
+
+### 8-1. ログアウトして未ログイン状態を作る
+POST {{baseUrl}}/api/auth/logout
+
+### 8-2. 未ログインでゲーム一覧取得 → 401
+GET {{baseUrl}}/api/games
+
+### 8-3. 未ログインでゲーム登録 → 401
+POST {{baseUrl}}/api/games
+Content-Type: application/json
+
+{
+  "title": "未ログインテスト"
+}
+
+### 8-4. 未ログインでプロフィール取得 → 401
+GET {{baseUrl}}/api/profile
+
+### 8-5. 未ログインで通知取得 → 401
+GET {{baseUrl}}/api/notifications
