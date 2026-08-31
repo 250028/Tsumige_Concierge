@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // 発表デモ時に開発モードのインジケーター（左下のNマーク）を非表示にする
+  devIndicators: false,
   images: {
     // アップロード画像など動的なローカルパスを許可（Next.js 15のセキュリティ要件）
     localPatterns: [
