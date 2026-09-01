@@ -17,8 +17,11 @@ export async function proxy(req: NextRequest) {
   const res     = NextResponse.next()
   const session = await getIronSession<SessionData>(req, res, sessionOptions)
 
-  // 未ログインなら /login にリダイレクト
+  // 未ログインの場合：APIルートはリダイレクトせず401 JSONを返す（fetchがリダイレクトを自動追跡してHTMLを受け取ってしまうため）
   if (!session.userId) {
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json({ message: 'ログインしてください' }, { status: 401 })
+    }
     return NextResponse.redirect(new URL('/login', req.url))
   }
 
