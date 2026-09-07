@@ -28,6 +28,8 @@ function createPrismaClient() {
     user:     dbUrl.username,
     password: dbUrl.password || undefined,
     database: dbUrl.pathname.slice(1),
+    // MySQL 8 の caching_sha2_password 認証で RSA 公開鍵を取得できるようにする
+    allowPublicKeyRetrieval: true,
   })
   return new PrismaClient({ adapter })
 }
