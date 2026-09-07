@@ -13,8 +13,9 @@ export const sessionOptions: SessionOptions = {
   password:    process.env.SESSION_SECRET as string,
   cookieName:  'tsumige_session',
   cookieOptions: {
-    // 本番環境では https のみ送信。開発環境は false
-    secure: process.env.NODE_ENV === 'production',
+    // 本来は本番(https)のみ true にしたいが、現状は HTTPS 未対応のIP直アクセスのため false に固定
+    // TODO: nginx に SSL(HTTPS)を設定したら process.env.NODE_ENV === 'production' に戻す
+    secure: false,
     maxAge: 60 * 60 * 24 * 7, // 7日間
   },
 }
