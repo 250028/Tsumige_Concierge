@@ -40,6 +40,11 @@ export default function NotificationBell() {
   async function fetchNotifications() {
     try {
       const res = await fetch('/api/notifications')
+      // API が失敗（401・500 など）したときは本文が空のことがあるため、json() を呼ぶ前に打ち切る
+      if (!res.ok) {
+        console.error(`通知の取得に失敗しました（HTTP ${res.status}）`)
+        return
+      }
       const data = await res.json()
       setNotifications(data.notifications ?? [])
       setUnreadCount(data.unreadCount ?? 0)
